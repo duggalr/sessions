@@ -1,0 +1,87 @@
+
+
+<h2>Manage Windows</h2>
+
+<form method="post">
+  
+  <input type="text" id="session_name" name="session_name"><br><br>
+  
+  {% for window_id in windows %} 
+
+    <h3>
+      Window {{ window_id }}
+      <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}">
+    </h3> 
+    <ul>
+      {% for di in windows[window_id] %}
+        <li>
+          <!-- <img src="{{ di['fav_url'] }}"> -->
+          <a href="{{ di['url'] }}">
+            {{ di['title'] }}
+          </a>
+        </li>
+        <br/>
+      {% endfor %}
+    </ul>
+
+  {% endfor %}
+
+  <input type="submit" value="Submit">
+
+</form>
+
+
+<br/>
+
+<h2>Manage Sessions</h2>
+
+{% for session_title in sessions %}
+
+  <h3>
+    {{ session_title }}
+    <!-- <a href="{{ url_for('delete_session', name=session_title) }}">delete session</a> -->
+    <a href="#" id="{{ session_title }}" onclick="deleteSession(this.id)">delete session</a>
+    <a href="{{ url_for('open_session', name=session_title) }}">open session</a>
+    
+  </h3>
+  <ul>
+    {% for di in sessions[session_title] %}
+      <li style="padding-top: 6px;">
+        <!-- <img src="{{ di['fav_url'] }}"> -->
+        <a href="{{ di['tab_url'] }}">
+          {{ di['tab_title'] }}
+        </a>      
+      </li>
+    {% endfor %}
+  </ul>
+
+
+
+
+<script>
+
+  function deleteSession(session_title){
+    console.log('ses-title:', session_title)
+
+    let text = "You sure you want to delete session?";
+    if (confirm(text) == true) {
+      console.log('deleting session')
+      window.location.href = 'http://127.0.0.1:5000/delete_session/' + session_title
+
+    } else {
+      console.log('cancel')
+    }
+    
+    return false;
+  }
+
+
+</script>
+
+
+{% endfor %}
+
+
+
+
+
