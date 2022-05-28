@@ -15,4 +15,5 @@ create table sessions(
   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
+
   

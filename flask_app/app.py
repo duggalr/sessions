@@ -79,18 +79,19 @@ def home():
 @app.route('/refresh_windows', methods=['POST'])
 def refresh_window():
   print('json-data:', request.get_json())
-  sql = 'delete from current_windows'
-  g.db.execute(sql)
-  g.db.commit()
-  data = request.get_json()
-  for di in data:
-    fav_url = di.get('favIconUrl', None)
-    title = di['title']
-    url = di['url']
-    window_id = di['windowId']
-    sql = 'insert into current_windows (window_id, title, url, fav_url) values (?, ?, ?, ?)'
-    g.db.execute(sql, (window_id, title, url, fav_url,))
-    g.db.commit()
+  # sql = 'delete from current_windows'
+  # g.db.execute(sql)
+  # g.db.commit()
+  # data = request.get_json()
+  # for li in data:
+  #   for di in li:
+  #     fav_url = di.get('favIconUrl', None)
+  #     title = di['title']
+  #     url = di['url']
+  #     window_id = di['windowId']
+  #     sql = 'insert into current_windows (window_id, title, url, fav_url) values (?, ?, ?, ?)'
+  #     g.db.execute(sql, (window_id, title, url, fav_url,))
+  #     g.db.commit()
 
   return {'success': True}
 

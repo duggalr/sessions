@@ -22,42 +22,42 @@ async function Request(url, data, method = 'POST') {
 }
 
 
-function sendAllWindows() {
+// function sendAllWindows() {
   
-  var final_dict = []
-  chrome.windows.getAll(function(all_windows_res){ 
-    // need to send all the tabs for each window
+//   var final_dict = []
+//   chrome.windows.getAll(function(all_windows_res){ 
+//     // need to send all the tabs for each window
     
-    // for (i=0; i<=all_windows_res.length-1; i++){
-    //   var window_di = all_windows_res[i]
-    //   console.log('window-dict:', window_di)
-    //   var window_id = window_di['id']
-    //   chrome.tabs.query({windowId: window_id}, function(tabs_info){
-    //     console.log('tabs-info:', tabs_info)
-    //     // final_dict[window_id] = tabs_info
-    //     // TODO: save tabs to array and pass final-array to flask-app
-    //     let response = Request(url=REFRESH_WINDOW_API_URL, data=tabs_info);
-    //     response.then(function(res){
-    //       console.log('window-refresh-response:', res)
-    //     });        
+//     // for (i=0; i<=all_windows_res.length-1; i++){
+//     //   var window_di = all_windows_res[i]
+//     //   console.log('window-dict:', window_di)
+//     //   var window_id = window_di['id']
+//     //   chrome.tabs.query({windowId: window_id}, function(tabs_info){
+//     //     console.log('tabs-info:', tabs_info)
+//     //     // final_dict[window_id] = tabs_info
+//     //     // TODO: save tabs to array and pass final-array to flask-app
+//     //     let response = Request(url=REFRESH_WINDOW_API_URL, data=tabs_info);
+//     //     response.then(function(res){
+//     //       console.log('window-refresh-response:', res)
+//     //     });        
 
-    //   })
-    // }
-    final_dict['testing'] = 'one'
+//     //   })
+//     // }
+//     final_dict['testing'] = 'one'
     
-  })
-  let response = Request(url=REFRESH_WINDOW_API_URL, data=final_dict);
-  response.then(function(res){
-    console.log('window-refresh-response:', res)
-  });        
+//   })
+//   let response = Request(url=REFRESH_WINDOW_API_URL, data=final_dict);
+//   response.then(function(res){
+//     console.log('window-refresh-response:', res)
+//   });        
 
-  // // console.log('final-dict:', final_dict)
-  // let response = Request(url=REFRESH_WINDOW_API_URL, data=final_dict);
-  // response.then(function(res){
-  //   console.log('window-refresh-response:', res)
-  // });
+//   // // console.log('final-dict:', final_dict)
+//   // let response = Request(url=REFRESH_WINDOW_API_URL, data=final_dict);
+//   // response.then(function(res){
+//   //   console.log('window-refresh-response:', res)
+//   // });
 
-}
+// }
 
 
 function getTabData(window_di){
@@ -72,12 +72,8 @@ function getTabData(window_di){
 }
 
 
-// On Install
-chrome.runtime.onInstalled.addListener((reason) => {
+function sendAllWindows(){
 
-  // console.log('reason:', reason)
-  // sendAllWindows()
-  
   chrome.windows.getAll(function(all_windows_res){
     var finalData = []
 
@@ -87,26 +83,92 @@ chrome.runtime.onInstalled.addListener((reason) => {
 
     Promise.all(finalData).then(function(values) {
       // console.log('final-values:', values)
-      
+
       let response = Request(url=REFRESH_WINDOW_API_URL, data=values);
       response.then(function(res){
         console.log('window-refresh-response:', res)
+        // chrome.tabs.update({
+        //   url: 'http://127.0.0.1:5000'
+        // })
+        // chrome.tabs.create({  // redirect to flask-app once complete
+        //   url: 'http://127.0.0.1:5000'
+        // });
       });
 
     });
 
   })
 
+
+}
+
+
+// On Initial Load (install, update)
+chrome.runtime.onInstalled.addListener((reason) => {
+
+  // sendWindows();
+
+  // // console.log('reason:', reason)
+  // // sendAllWindows()
   
+  // chrome.windows.getAll(function(all_windows_res){
+  //   var finalData = []
 
+  //   for (i=0; i <= all_windows_res.length-1; i++){
+  //     finalData.push(getTabData(all_windows_res[i]))
+  //   }
 
-  // chrome.tabs.create({
-  //   url: 'http://127.0.0.1:5000'
-  // });
-  // send all active windows
-    // once complete, redirect to the flask-app
+  //   Promise.all(finalData).then(function(values) {
+  //     // console.log('final-values:', values)
+      
+  //     let response = Request(url=REFRESH_WINDOW_API_URL, data=values);
+  //     response.then(function(res){
+  //       console.log('window-refresh-response:', res)
+  //       chrome.tabs.create({  // redirect to flask-app once complete
+  //         url: 'http://127.0.0.1:5000'
+  //       });
+  //     });
+
+  //   });
+
+  // })
 
 });
+
+
+// chrome.tabs.onCreated.addListener(function(res){
+//     console.log('tab-created:', res)
+
+//     var pending_url = res['pendingUrl']
+//     console.log('pend-url:', pending_url)
+//     if (pending_url == "chrome://newtab/"){
+//       chrome.tabs.update({
+//         url: 'main.html'
+//       })
+      
+//       // console.log('new-tab!')
+//       // sendWindows()
+//     }
+
+//   }
+// )
+
+//TODO: On button-click of the CE --> send to flask-app
+chrome.action.onClicked.addListener(function(res){
+  console.log('extension-clicked:', res)
+
+  sendAllWindows()
+
+})
+  
+
+  // TODO: fetchWindowData and then send request/create new-tab here
+  // chrome.tabs.create({
+  //   url: 'http://127.0.0.1:5000'
+  // })
+
+// })
+
 
 
 // // On inital load, get all open windows
