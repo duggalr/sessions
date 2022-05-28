@@ -22,137 +22,110 @@ async function Request(url, data, method = 'POST') {
 }
 
 
-function getWindowDict(windows_res) {
-
-  return new Promise(function(resolve, reject){
-
-    var tmp_arr = []
-    for (i=0; i<=windows_res.length-1; i++){
-      var window_di = windows_res[i]
-      var window_id = window_di['id']
-      chrome.tabs.query({windowId: window_id}, function(tabs_info){
-        for (x=0; x<=tabs_info.length-1; x++){
-          tmp_arr.push(tabs_info[x])
-          // tmp_arr.push('testing')
-          // var ti = tabs_info[x]
-          // tmp_arr[x] = ti
-          // tmp_arr.push({
-          //   // 'title': ti['title'], 'url': ti['url'], 'window_id': ti['windowId']
-          //   0: 'title'
-          // })
-          // tmp_arr.push({
-          //   'title': ti['title'], 'url': ti['url']
-          // })
-          // final_arr.push(ti)
-          // final_arr.push({
-          //   'title': ti['title'], 'url': ti['url'], 'window_id': ti['windowId']
-          // })
-        }
-      })
-    }
-
-    resolve(tmp_arr)
-
-  })
+function sendAllWindows() {
   
-}
-
-    // // var final_dict = {} // {window_1: [tab_one, tab_two] ...}
-    // var final_arr = []
-    // for (i=0; i<=windows_res.length-1; i++){
-    //   var window_di = windows_res[i]
+  var final_dict = []
+  chrome.windows.getAll(function(all_windows_res){ 
+    // need to send all the tabs for each window
+    
+    // for (i=0; i<=all_windows_res.length-1; i++){
+    //   var window_di = all_windows_res[i]
+    //   console.log('window-dict:', window_di)
     //   var window_id = window_di['id']
     //   chrome.tabs.query({windowId: window_id}, function(tabs_info){
-    //     // var tmp_arr = []
-    //     for (x=0; x<=tabs_info.length-1; x++){
-    //       var ti = tabs_info[x]
-    //       // tmp_arr.push({
-    //       //   'title': ti['title'], 'url': ti['url']
-    //       // })
-
-    //       // final_arr.push(ti)
-    //       final_arr.push({
-    //         'title': ti['title'], 'url': ti['url'], 'window_id': ti['windowId']
-    //       })
-    //     }
-
+    //     console.log('tabs-info:', tabs_info)
     //     // final_dict[window_id] = tabs_info
-    //     // final_arr.push({'window_id': window_id, 'tabs_info': tabs_info})
-    //     // final_arr.push(tabs_info)
-    //     // final_arr.push({''})
-    //     // for (x=0; x<=tabs_info.length-1; i++){
-    //     //   final_arr.push
-    //     // }
+    //     // TODO: save tabs to array and pass final-array to flask-app
+    //     let response = Request(url=REFRESH_WINDOW_API_URL, data=tabs_info);
+    //     response.then(function(res){
+    //       console.log('window-refresh-response:', res)
+    //     });        
 
     //   })
     // }
-    // var final_data = {'window_info': windows_res, 'tab_arr': final_arr}
-    // resolve(final_data)
-
-  // })
-
-// }
-
-
-function sendRes(final_info){
-
-  let response = Request(url=REFRESH_WINDOW_API_URL, data=final_info);
+    final_dict['testing'] = 'one'
+    
+  })
+  let response = Request(url=REFRESH_WINDOW_API_URL, data=final_dict);
   response.then(function(res){
     console.log('window-refresh-response:', res)
-  });
+  });        
+
+  // // console.log('final-dict:', final_dict)
+  // let response = Request(url=REFRESH_WINDOW_API_URL, data=final_dict);
+  // response.then(function(res){
+  //   console.log('window-refresh-response:', res)
+  // });
 
 }
 
 
+function getTabData(window_di){
 
-function mainFN(){
-
-  chrome.windows.getAll(function(windows_res){
-
-    getWindowDict(windows_res).then(function(final_info){
-      console.log('window-dict:', final_info)
-      setTimeout(function(){
-        // console.log('js', JSON.stringify(final_info))
-        sendRes(final_info)
-      }, 2000)
-      // console.log(JSON.stringify(final_info))
-  
-  
-      // var new_final_info = Object.assign({}, final_info)
-      // console.log(JSON.stringify(new_final_info))
-  
-      // let response = Request(url=REFRESH_WINDOW_API_URL, data=final_info);
-      // response.then(function(res){
-      //   console.log('window-refresh-response:', res)
-      // });
-  
+  return new Promise(function(resolve, reject){
+    chrome.tabs.query({windowId: window_di['id']}, function(tabs_info){
+      // console.log('tabs-info:', tabs_info)
+      resolve(tabs_info)
     })
-  
-    // console.log('windows-res:', windows_res)
-    // var final_dict = {} // {window_1: [tab_one, tab_two] ...}
-    // for (i=0; i<=windows_res.length-1; i++){
-    //   var window_di = windows_res[i]
-    //   var window_id = window_di['id']
-  
-    //   chrome.tabs.query({windowId: window_id}, function(tabs_info){
-    //     console.log('tabs:', tabs_info)
-    //     final_dict[window_id] = tabs_info
-    //     // send to flask; will be sent on 'refresh' <-- update the page (don't save in DB)
-    //       // save the tab-info for only those in a session on CRUD
-    //     // favIconUrl, title, url
-    //   })
-      
-    // }
-  
   })
 
-
-  // setTimeout(mainFN, 5000);
-
 }
 
 
-// hacky tmp-way
-mainFN();
+// On Install
+chrome.runtime.onInstalled.addListener((reason) => {
+
+  // console.log('reason:', reason)
+  // sendAllWindows()
+  
+  chrome.windows.getAll(function(all_windows_res){
+    var finalData = []
+
+    for (i=0; i <= all_windows_res.length-1; i++){
+      finalData.push(getTabData(all_windows_res[i]))
+    }
+
+    Promise.all(finalData).then(function(values) {
+      // console.log('final-values:', values)
+      
+      let response = Request(url=REFRESH_WINDOW_API_URL, data=values);
+      response.then(function(res){
+        console.log('window-refresh-response:', res)
+      });
+
+    });
+
+  })
+
+  
+
+
+  // chrome.tabs.create({
+  //   url: 'http://127.0.0.1:5000'
+  // });
+  // send all active windows
+    // once complete, redirect to the flask-app
+
+});
+
+
+// // On inital load, get all open windows
+//   // After that, have event-listeners for CRUD on tabs
+//     // Setup the BE here and have the retrieve ability (click tab/window, goes to that specific tab/window)
+
+// chrome.windows.getAll(function(windows_res){
+
+//   getWindowDict(windows_res).then(function(final_info){
+//     console.log('window-dict:', final_info)
+//     setTimeout(function(){
+//       // console.log('js', JSON.stringify(final_info))
+//       sendRes(final_info)
+//     }, 2000)
+//     // console.log(JSON.stringify(final_info))
+
+// })
+
+
+
 
 
