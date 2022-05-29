@@ -1,6 +1,7 @@
 create table current_windows(
   id int primary key,
   window_id int,
+  tab_id int,
   title text, 
   url text, 
   fav_url text

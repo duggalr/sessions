@@ -2,10 +2,12 @@
 
 <h2>Manage Windows</h2>
 
-<form method="post">
+<!-- <form method="post"> -->
   
-  <input type="text" id="session_name" name="session_name"><br><br>
+  <!-- <input type="text" id="session_name" name="session_name"><br><br> -->
   
+  <button id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button>
+
   {% for window_id in windows %} 
 
     <h3>
@@ -17,8 +19,11 @@
         <li>
           <!-- <img src="{{ di['fav_url'] }}"> -->
           <a href="{{ di['url'] }}">
-            {{ di['title'] }}
+            {{ di['title'] }} 
           </a>
+          &nbsp;&nbsp;&nbsp;
+          <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button>
+
         </li>
         <br/>
       {% endfor %}
@@ -26,12 +31,12 @@
 
   {% endfor %}
 
-  <input type="submit" value="Submit">
+  <!-- <input type="submit" value="Submit"> -->
 
-</form>
-
+<!-- </form> -->
 
 <br/>
+
 
 <h2>Manage Sessions</h2>
 
@@ -55,10 +60,29 @@
     {% endfor %}
   </ul>
 
+{% endfor %}
 
 
 
 <script>
+
+  // $('#delete_tab_button').click(function(){
+  //   console.log('button-clicked')
+
+  // })
+
+  function deleteTab(tab_id){
+
+    console.log('tab-delete:', tab_id)
+    // send tab-id to remove <-- prevent malicious requests here (ie. user sends list of tab-id's to delete upon site-visit)?
+    var data = { type: "remove_tab", tabID: tab_id };
+    window.postMessage(data, "*");
+    setTimeout(refreshSession(), 1500);
+
+    // Need to refresh the windows
+
+  }
+
 
   function deleteSession(session_title){
     console.log('ses-title:', session_title)
@@ -75,11 +99,17 @@
     return false;
   }
 
+  function refreshSession(){
+
+    var data = { type: "refresh_session" };
+    window.postMessage(data, "*");
+
+  }
+
 
 </script>
 
 
-{% endfor %}
 
 
 

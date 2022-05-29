@@ -10,6 +10,12 @@
   "permissions": [
     "tabs"
   ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>", "http://*/*", "https://*/*"],
+      "js": ["content.js"]
+    }
+  ],
   "host_permissions": ["<all_urls>"]
   
 }

@@ -49,15 +49,16 @@ def home():
   windows_dict = {}
   for rw in li:
     window_id = rw['window_id']
+    tab_id = rw['tab_id']
     tab_title = rw['title']
     tab_url = rw['url']
     fav_url = rw['fav_url']
     if window_id in windows_dict:
       old_li = windows_dict[window_id]
-      old_li.append({'title': tab_title, 'url': tab_url, 'fav_url': fav_url})
+      old_li.append({'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url, })
       windows_dict[window_id] = old_li
     else: 
-      windows_dict[window_id] = [{'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
+      windows_dict[window_id] = [{'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
   
   sql = 'select * from sessions'
   cur = g.db.execute(sql)
@@ -78,20 +79,21 @@ def home():
 
 @app.route('/refresh_windows', methods=['POST'])
 def refresh_window():
-  print('json-data:', request.get_json())
-  # sql = 'delete from current_windows'
-  # g.db.execute(sql)
-  # g.db.commit()
-  # data = request.get_json()
-  # for li in data:
-  #   for di in li:
-  #     fav_url = di.get('favIconUrl', None)
-  #     title = di['title']
-  #     url = di['url']
-  #     window_id = di['windowId']
-  #     sql = 'insert into current_windows (window_id, title, url, fav_url) values (?, ?, ?, ?)'
-  #     g.db.execute(sql, (window_id, title, url, fav_url,))
-  #     g.db.commit()
+  # print('json-data:', request.get_json())
+  sql = 'delete from current_windows'
+  g.db.execute(sql)
+  g.db.commit()
+  data = request.get_json()
+  for li in data:
+    for di in li:
+      fav_url = di.get('favIconUrl', None)
+      title = di['title']
+      url = di['url']
+      window_id = di['windowId']
+      tab_id = di['id']
+      sql = 'insert into current_windows (window_id, tab_id, title, url, fav_url) values (?, ?, ?, ?, ?)'
+      g.db.execute(sql, (window_id, tab_id, title, url, fav_url,))
+      g.db.commit()
 
   return {'success': True}
 
