@@ -47,7 +47,6 @@ function sendAllWindows(){
       // console.log('window-dict:', all_windows_res[i])
       finalData.push(getTabData(all_windows_res[i]))
     }
-    // TODO: group windows by current-active, open, minimized
 
     Promise.all(finalData).then(function(values) {
 

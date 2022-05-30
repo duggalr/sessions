@@ -131,19 +131,37 @@ def home():
   #   else: 
   #     windows_dict[window_id] = [{'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
   
-  sql = 'select * from sessions'
+  sql = 'select session_title from sessions'
   cur = g.db.execute(sql)
   sessions_li = cur.fetchall()
   sessions_dict = {}
   for rw in sessions_li:
     session_title = rw['session_title']
-    if session_title in sessions_dict:
-      old_li = sessions_dict[session_title]
-      old_li.append({'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']})
-      sessions_dict[session_title] = old_li
-    else:
-      sessions_dict[session_title] = [{'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}]
+    # for each session_title, get all rows; create window-dict for each session and save in final sessions_dict
+      # display each session with window-blocks
+    all_windows_query = 'select * from sessions where session_title=?'
+    cur = g.db.execute(all_windows_query, (session_title,))
+    all_windows = cur.fetchall()
+    
+    session_window_dict = {}
+    for rw in all_windows:
+      window_id = rw['window_id']
+      if window_id in session_window_dict:
+        old_li = session_window_dict[window_id]
+        tab_dict = {'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}
+        old_li.append(tab_dict)
+        session_window_dict[window_id] = old_li
+      else:
+        session_window_dict[window_id] = [{'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}]
 
+    sessions_dict[session_title] = session_window_dict
+
+    # if session_title in sessions_dict:
+    #   old_li = sessions_dict[session_title]
+    #   old_li.append({'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']})
+    #   sessions_dict[session_title] = old_li
+    # else:
+    #   sessions_dict[session_title] = [{'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}]
 
   return render_template(
     'new_home.html', 

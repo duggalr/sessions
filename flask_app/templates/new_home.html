@@ -150,6 +150,38 @@
       <div class="eight wide column">
         <h2>Saved Sessions</h2>
 
+        {% for session_title in sessions %}
+
+          <h3>
+            {{ session_title }}
+            &nbsp;
+            <button class="tiny ui button">Open Session</button>
+            <button class="tiny ui button">Update Session</button>
+            <button class="tiny ui button">Delete Session</button>
+          </h3>
+
+          {% for window_id in sessions[session_title] %}
+        
+            <h5>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
+              &nbsp;
+              <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
+            </h5>
+            
+            <ul>
+              {% for window_dict in sessions[session_title][window_id] %}
+                <li>
+                  <a href="{{ window_dict['tab_url'] }}">
+                    {{ window_dict['tab_title'] }} 
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>         
+
+          {% endfor %}
+
+        {% endfor %}
+
 
       </div>
 
@@ -173,7 +205,7 @@
         // TODO: prevent malicious requests here (ie. user sends list of tab-id's to delete upon site-visit)?
         var data = { type: "remove_tab", tabID: tab_id };
         window.postMessage(data, "*");
-        refreshSession();
+        // refreshSession();
 
       }
 
