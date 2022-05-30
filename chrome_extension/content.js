@@ -13,13 +13,11 @@ window.addEventListener("message", function(event) {
       chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {        
         // console.log('bckjs-res:', response)
         // TODO: 
-          // CRUD for sessions <-- most important (will need for tmw) (need select-all, etc.)
-            // work on UI 
-              // Organize windows with hostname-tabs
-              // show the current active window at top (mark as current)
-              // say 'minimized' for other windows
-
-
+          // open session 
+          // delete functionality
+          // usage <-- see any other features would be useful 
+            // potentially desktop as we continue using it
+          // after: start the BM-explorations 
       });
 
     }
