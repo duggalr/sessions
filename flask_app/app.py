@@ -33,19 +33,27 @@ def save_session():
   print('data:', request.get_json())
   form_data = request.get_json()
   session_name = form_data['session_name']
-  window_ids = form_data['window_id_list']
-  for wid in window_ids:
-    sql = 'select title, url from current_windows where window_id = ?'
-    cur = g.db.execute(sql, (wid,))
-    window_tabs = cur.fetchall()
-    for rw in window_tabs:
-      sql = 'insert into sessions (session_title, window_id, tab_title, tab_url) values (?, ?, ?, ?)'
-      g.db.execute(sql, (session_name, wid, rw['title'], rw['url']))
-      g.db.commit()
+  
+  sql = 'select * from sessions where session_title = ?'
+  cur = g.db.execute(sql, (session_name,))
+  existing_sessions = cur.fetchall()
+  print('length-sessions:', existing_sessions)
+  if len(existing_sessions) == 0:
+    window_ids = form_data['window_id_list']
+    for wid in window_ids:
+      sql = 'select title, url from current_windows where window_id = ?'
+      cur = g.db.execute(sql, (wid,))
+      window_tabs = cur.fetchall()
+      for rw in window_tabs:
+        sql = 'insert into sessions (session_title, window_id, tab_title, tab_url) values (?, ?, ?, ?)'
+        g.db.execute(sql, (session_name, wid, rw['title'], rw['url']))
+        g.db.commit()
 
-  return redirect(url_for('home'))
+    return {'success': True}
 
-# TODO: save in separate windows and refresh/redirect to home
+  else:
+    return {'success': False, 'error_message': 'this session already exists...'}
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -131,7 +139,7 @@ def home():
   #   else: 
   #     windows_dict[window_id] = [{'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
   
-  sql = 'select session_title from sessions'
+  sql = 'select session_title from sessions order by timestamp desc'
   cur = g.db.execute(sql)
   sessions_li = cur.fetchall()
   sessions_dict = {}
@@ -156,12 +164,6 @@ def home():
 
     sessions_dict[session_title] = session_window_dict
 
-    # if session_title in sessions_dict:
-    #   old_li = sessions_dict[session_title]
-    #   old_li.append({'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']})
-    #   sessions_dict[session_title] = old_li
-    # else:
-    #   sessions_dict[session_title] = [{'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}]
 
   return render_template(
     'new_home.html', 
@@ -213,6 +215,15 @@ def delete_session(name):
   g.db.execute(sql, (name,))
   g.db.commit()
   return redirect(url_for('home'))
+
+
+@app.route('/update_session/<name>', methods=['POST'])
+def update_session():
+  pass
+
+
+def delete_session_window():
+  pass
 
 
 @app.route('/open_session/<name>', methods=['GET'])

@@ -23,10 +23,11 @@
         padding-top: 10px;
         /* float: left; */
       }
-
+      
       .ui .checkbox{
         display: none;
       }
+
 
     </style>
     
@@ -35,18 +36,18 @@
 
   <body>
 
-    <!-- <button id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button> -->
-
     <div class="ui grid container" style="padding-top: 25px">
 
       <div class="eight wide column">
         <h2 style="display: inline;">Windows</h2>
-        <span style="padding-left: 10px; font-size: 16px; font-weight: 700;"> (last updated: {{ last_refreshed_timestamp }} minute(s) ago... )</span>
+        <span style="padding-left: 10px; font-size: 16px; font-weight: 700; "> (last updated: {{ last_refreshed_timestamp }} minute(s) ago... )</span>
         
         <div id="button_div">
-          <button class="ui button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button>
+          <button class="ui button" id="refresh_active_sessions" onclick="refreshSession()">Refresh</button>
           <button class="ui button" id="create_session_button" onclick="showSessionForm()">Create Session</button>
         </div>
+
+        <p id="error_message" style="color: red; padding-top: 10px; display: none;">use a unique session name...</p>
 
         <br/>
 
@@ -62,15 +63,23 @@
 
         </form>
 
-        <h3>
-          Focused Window:
-          &nbsp;
+
+        <div style="display: inline-flex; padding-top: 10px; ">
+          <h3>
+            Focused Window:
+            <div class="ui checkbox" style="padding-left: 5px">
+              <input name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
+              <label>(save all)</label>
+            </div>
+          </h3>
+          <!-- &nbsp;
           <div class="ui checkbox">
             <input name="window_{{ focused_window_id }}" type="checkbox" value="{{ focused_window_id }}">
             <label>(save all)</label>
-          </div>
+          </div> -->
 
-        </h3>
+        </div>
+        
         <ul>
           {% for di in focused_tabs_list %}
             <li>
@@ -91,7 +100,7 @@
           <h4>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
             &nbsp;
-            <div class="ui checkbox">
+            <div class="ui checkbox" style="padding-left: 5px">
               <input name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
               <label>(save all)</label>
             </div>
@@ -126,6 +135,7 @@
             </div>
             <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
           </h5> 
+
           <ul>
             {% for di in minimized_windows_dict[window_id] %}
               <li>
@@ -147,33 +157,56 @@
         
 
       </div>
+
       <div class="eight wide column">
         <h2>Saved Sessions</h2>
 
         {% for session_title in sessions %}
 
-          <h3>
+          <div style="display: flex; padding-top: 10px;">
+            <h3 id="session_title_header">
+              {{ session_title }}
+            </h3>
+            <div id="session_name_input" class="ui input" style="display: none;">
+              <input type="text" name="session_name" value="{{ session_title }}">
+            </div>
+            &nbsp;&nbsp;&nbsp;
+            <div>
+              <button id="submit_session_button" class="tiny ui blue button" onclick="submitSession()" style="display: none;">Save Changes</button>
+              <button class="tiny ui button">Open Session</button>
+              <button id="{{ session_title }}" class="tiny ui button update" onclick="updateSession(this.id)">Update Session</button>
+              <button id="{{ session_title }}" class="tiny ui button" onclick="deleteSession(this.id)">Delete Session</button>
+
+            </div>
+
+          </div>
+          
+
+          <!-- <h3>
             {{ session_title }}
+            <input type="text" id="session_name_input" name="session_name" value="{{ session_title }}" style="display: none;">
             &nbsp;
             <button class="tiny ui button">Open Session</button>
             <button class="tiny ui button">Update Session</button>
-            <button class="tiny ui button">Delete Session</button>
-          </h3>
+            <button id="{{ session_title }}" class="tiny ui button" onclick="deleteSession(this.id)">Delete Session</button>
+          </h3> -->
 
           {% for window_id in sessions[session_title] %}
         
             <h5>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
-              &nbsp;
+              &nbsp;              
               <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
+              <i id="delete_session_trash_icon" class="trash alternate outline icon" onclick="deleteSessionWindow()" style="display: none;"></i>
             </h5>
+            
             
             <ul>
               {% for window_dict in sessions[session_title][window_id] %}
                 <li>
                   <a href="{{ window_dict['tab_url'] }}">
                     {{ window_dict['tab_title'] }} 
-                  </a>
+                  </a>                  
                 </li>
               {% endfor %}
             </ul>         
@@ -239,12 +272,47 @@
           contentType: 'application/json',
           dataType : 'json',
           data : JSON.stringify(final_dict),
-          success: function(){}
+          success: function(res){
+              if (res['success'] === true){
+                window.location = '/'
+              } else {
+                $('#error_message').show()
+              }
+            
+          }
           
         });
-        
 
       });
+
+
+      function deleteSession(session_title){
+        console.log('ses-title:', session_title)
+
+        let text = "You sure you want to delete session?";
+        if (confirm(text) == true) {
+          console.log('deleting session')
+          window.location.href = 'http://127.0.0.1:5000/delete_session/' + session_title
+
+        } else {
+          console.log('cancel')
+        }
+        
+        return false;
+      }
+
+
+      function updateSession(session_title){
+        
+        $('#session_title_header').hide()
+        $('#session_name_input').show()
+        $('.tiny.ui.button.update').hide()
+        $('.ui .checkbox').css('display', 'inline-block')
+        $('#submit_session_button').show()
+        $('#delete_session_trash_icon').show()
+
+      }
+
 
 
     </script>
