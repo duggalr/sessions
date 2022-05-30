@@ -4,8 +4,10 @@
     <!-- TODO: fav-icon (same as CE) -->
     <title>Sessions</title>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
 
     <style>
 
@@ -22,6 +24,10 @@
         /* float: left; */
       }
 
+      .ui .checkbox{
+        display: none;
+      }
+
     </style>
     
 
@@ -31,7 +37,7 @@
 
     <!-- <button id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button> -->
 
-    <div class="ui grid container">
+    <div class="ui grid container" style="padding-top: 25px">
 
       <div class="eight wide column">
         <h2 style="display: inline;">Windows</h2>
@@ -39,11 +45,32 @@
         
         <div id="button_div">
           <button class="ui button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button>
-          <button class="ui button" id="create_session">Create Session</button>
+          <button class="ui button" id="create_session_button" onclick="showSessionForm()">Create Session</button>
         </div>
-        
 
-        <h3>Focused Window:</h3>
+        <br/>
+
+        <form id="session_form" class="ui form" style="display: none;" >
+
+          <div class="inline fields">
+            <div class="six wide field" >
+              <input id="session_name" type="text" name="session_name" placeholder="Session Name">
+            </div>
+            <button class="ui primary button" type="submit">Submit</button>
+
+          </div>
+
+        </form>
+
+        <h3>
+          Focused Window:
+          &nbsp;
+          <div class="ui checkbox">
+            <input name="window_{{ focused_window_id }}" type="checkbox" value="{{ focused_window_id }}">
+            <label>(save all)</label>
+          </div>
+
+        </h3>
         <ul>
           {% for di in focused_tabs_list %}
             <li>
@@ -53,6 +80,7 @@
               &nbsp;&nbsp;&nbsp;
               <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
               <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
+
             </li>
           {% endfor %}
         </ul>
@@ -62,6 +90,11 @@
         
           <h4>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
+            &nbsp;
+            <div class="ui checkbox">
+              <input name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
+              <label>(save all)</label>
+            </div>
             <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
           </h4> 
 
@@ -86,6 +119,11 @@
 
           <h5>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
+            &nbsp;
+            <div class="ui checkbox">
+              <input name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
+              <label>(save all)</label>
+            </div>
             <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
           </h5> 
           <ul>
@@ -139,6 +177,42 @@
 
       }
 
+      function showSessionForm(){
+        $('#session_form').show()
+        $('.ui .checkbox').show()
+
+        $('#create_session_button').hide()
+        // document.getElementById('session_form').
+
+      }
+
+
+      $( "#session_form" ).submit(function( event ) {
+        event.preventDefault();
+
+        var window_id_list = []
+        $('input:checkbox:checked').each(function(){
+          // console.log('val:', this.checked, $(this).val())
+          var window_id = $(this).val()
+          window_id_list.push(window_id)
+        })
+        
+        var session_name = $('#session_name').val()
+        var final_dict = {'session_name': session_name, 'window_id_list': window_id_list}
+        console.log('final-dict:', final_dict)
+    
+        $.ajax({
+          url : "/save-session",
+          type: "POST",
+          contentType: 'application/json',
+          dataType : 'json',
+          data : JSON.stringify(final_dict),
+          success: function(){}
+          
+        });
+        
+
+      });
 
 
     </script>

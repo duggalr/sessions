@@ -13,6 +13,7 @@ create table current_windows(
 create table sessions(
   id int primary key,
   session_title text, 
+  window_id int,
   tab_title text, 
   tab_url text,
   tab_fav_url text,

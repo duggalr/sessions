@@ -27,20 +27,41 @@ def teardown_request(exception):
     db.close()
 
 
+
+@app.route('/save-session', methods=['POST'])
+def save_session():
+  print('data:', request.get_json())
+  form_data = request.get_json()
+  session_name = form_data['session_name']
+  window_ids = form_data['window_id_list']
+  for wid in window_ids:
+    sql = 'select title, url from current_windows where window_id = ?'
+    cur = g.db.execute(sql, (wid,))
+    window_tabs = cur.fetchall()
+    for rw in window_tabs:
+      sql = 'insert into sessions (session_title, window_id, tab_title, tab_url) values (?, ?, ?, ?)'
+      g.db.execute(sql, (session_name, wid, rw['title'], rw['url']))
+      g.db.commit()
+
+  return redirect(url_for('home'))
+
+# TODO: save in separate windows and refresh/redirect to home
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
-  if request.method == 'POST':
-    print(request.form)
-    session_name = request.form.get('session_name')
-    for key, val in request.form.items():
-      if key.startswith("window"):
-        sql = 'select title, url from current_windows where window_id = ?'
-        cur = g.db.execute(sql, (val,))
-        window_tabs = cur.fetchall()
-        for rw in window_tabs:
-          sql = 'insert into sessions (session_title, tab_title, tab_url) values (?, ?, ?)'
-          g.db.execute(sql, (session_name, rw['title'], rw['url']))
-          g.db.commit()
+  # if request.method == 'POST':
+  #   print(request.form)
+    # session_name = request.form.get('session_name')
+    # for key, val in request.form.items():
+    #   if key.startswith("window"):
+    #     sql = 'select title, url from current_windows where window_id = ?'
+    #     cur = g.db.execute(sql, (val,))
+    #     window_tabs = cur.fetchall()
+    #     for rw in window_tabs:
+    #       sql = 'insert into sessions (session_title, tab_title, tab_url) values (?, ?, ?)'
+    #       g.db.execute(sql, (session_name, rw['title'], rw['url']))
+    #       g.db.commit()
 
 
   sql = 'select * from current_windows where window_focused=1'
@@ -127,6 +148,7 @@ def home():
   return render_template(
     'new_home.html', 
     last_refreshed_timestamp=last_refreshed_timestamp,
+    focused_window_id=focused_window_tabs[0]['window_id'],
     focused_tabs_list=focused_windows_list,
     minimized_windows_dict=minimized_windows_dict,
     active_windows_dict=active_windows_dict,
