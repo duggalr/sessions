@@ -217,13 +217,53 @@ def delete_session(name):
   return redirect(url_for('home'))
 
 
-@app.route('/update_session/<name>', methods=['POST'])
+@app.route('/update_session', methods=['POST'])
 def update_session():
-  pass
+  data = request.get_json()
+  print('data:', data)
+  session_name = data['session_name']  
+
+  sql = 'select * from sessions where session_title = ?'
+  cur = g.db.execute(sql, (session_name,))
+  existing_sessions = cur.fetchall()
+  print('length-sessions:', existing_sessions)
+  if len(existing_sessions) >= 1:
+    window_ids = data['window_id_list']
+    for wid in window_ids:
+      sql = 'select title, url from current_windows where window_id = ?'
+      cur = g.db.execute(sql, (wid,))
+      window_tabs = cur.fetchall()
+      for rw in window_tabs:
+        sql = 'insert into sessions (session_title, window_id, tab_title, tab_url) values (?, ?, ?, ?)'
+        g.db.execute(sql, (session_name, wid, rw['title'], rw['url']))
+        g.db.commit()
+
+  return {'success': True}
 
 
+@app.route('/delete_session_window', methods=['POST'])
 def delete_session_window():
-  pass
+  data = request.get_json()
+  st = data['wid']
+  li = st.split('wid')
+  session_title = li[0].split('session_')[1].split('_')[0]
+  window_id = li[1].split('_')[1]
+
+  sql = 'select * from sessions where session_title=?'
+  cur = g.db.execute(sql, (session_title,))
+  li = cur.fetchall()
+  if len(li) <= 1:
+    sql = 'delete from sessions where session_title=?'
+    g.db.execute(sql, (session_title,))
+    g.db.commit()
+  else:
+    sql = 'delete from sessions where session_title=? and window_id=?'
+    g.db.execute(sql, (session_title, window_id,))
+    g.db.commit()
+
+  return {'success': True}
+
+
 
 
 @app.route('/open_session/<name>', methods=['GET'])

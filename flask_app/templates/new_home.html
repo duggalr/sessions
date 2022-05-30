@@ -68,7 +68,7 @@
           <h3>
             Focused Window:
             <div class="ui checkbox" style="padding-left: 5px">
-              <input name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
+              <input name="window_{{ focused_window_id }}" type="checkbox" value="{{ focused_window_id }}">
               <label>(save all)</label>
             </div>
           </h3>
@@ -167,12 +167,12 @@
             <h3 id="session_title_header">
               {{ session_title }}
             </h3>
-            <div id="session_name_input" class="ui input" style="display: none;">
+            <!-- <div id="session_name_input_update" class="ui input" style="display: none;">
               <input type="text" name="session_name" value="{{ session_title }}">
-            </div>
+            </div> -->
             &nbsp;&nbsp;&nbsp;
             <div>
-              <button id="submit_session_button" class="tiny ui blue button" onclick="submitSession()" style="display: none;">Save Changes</button>
+              <button id="submit_session_button" class="tiny ui blue button" style="display: none;">Save Changes</button>
               <button class="tiny ui button">Open Session</button>
               <button id="{{ session_title }}" class="tiny ui button update" onclick="updateSession(this.id)">Update Session</button>
               <button id="{{ session_title }}" class="tiny ui button" onclick="deleteSession(this.id)">Delete Session</button>
@@ -197,7 +197,7 @@
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
               &nbsp;              
               <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
-              <i id="delete_session_trash_icon" class="trash alternate outline icon" onclick="deleteSessionWindow()" style="display: none;"></i>
+              <i id="session_{{ session_title }}_wid_{{ window_id }}" class="trash alternate outline icon saved_session_icon" onclick="deleteSessionWindow(this.id)" ></i>
             </h5>
             
             
@@ -244,8 +244,7 @@
 
       function showSessionForm(){
         $('#session_form').show()
-        $('.ui .checkbox').show()
-
+        $('.ui .checkbox').css('display', 'inline-block')
         $('#create_session_button').hide()
         // document.getElementById('session_form').
 
@@ -301,17 +300,77 @@
         return false;
       }
 
+      var currentUpdateSesssionTitle;
 
       function updateSession(session_title){
-        
-        $('#session_title_header').hide()
-        $('#session_name_input').show()
+        currentUpdateSesssionTitle = session_title
+
+        // $('#session_title_header').hide()
+        // $('#session_name_input_update').show()
         $('.tiny.ui.button.update').hide()
         $('.ui .checkbox').css('display', 'inline-block')
         $('#submit_session_button').show()
-        $('#delete_session_trash_icon').show()
+        $('.saved_session_icon').hide()
 
       }
+
+
+      function deleteSessionWindow(session_window_id){
+        console.log('deleting session:', session_window_id)
+        var di = {'wid': session_window_id}
+
+        $.ajax({
+          url : "/delete_session_window",
+          type: "POST",
+          contentType: 'application/json',
+          dataType : 'json',
+          data : JSON.stringify(di),
+          success: function(res){
+            window.location = '/'
+            // if (res['success'] === true){
+            //   window.location = '/'
+            // } else {
+            //   $('#error_message').show()
+            // }
+          }
+        });
+
+      }
+
+
+      $( "#submit_session_button" ).click(function( event ) {
+        event.preventDefault();
+
+        // var session_name = $('#session_name_input_update').children('input')[0].value
+        var window_id_list = []
+        $('input:checkbox:checked').each(function(){
+          // console.log('val:', this.checked, $(this).val())
+          var window_id = $(this).val()
+          window_id_list.push(window_id)
+        })
+
+        var final_dict = {'session_name': currentUpdateSesssionTitle, 'window_id_list': window_id_list}
+        console.log('final-dict:', final_dict)
+
+        $.ajax({
+          url : "/update_session",
+          type: "POST",
+          contentType: 'application/json',
+          dataType : 'json',
+          data : JSON.stringify(final_dict),
+          success: function(res){
+            window.location = '/'
+            // if (res['success'] === true){
+            //   window.location = '/'
+            // } else {
+            //   $('#error_message').show()
+            // }
+          }
+        });
+
+
+      })
+      
 
 
 
