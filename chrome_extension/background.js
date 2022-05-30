@@ -45,13 +45,12 @@ function sendAllWindows(){
 
     Promise.all(finalData).then(function(values) {
 
-      let response = Request(url=REFRESH_WINDOW_API_URL, data=values);
+      let response = Request(url=REFRESH_WINDOW_API_URL, data=values)
       response.then(function(res){
         console.log('window-refresh-response:', res)
-        // chrome.tabs.create({  // redirect to flask-app once complete
-        //   url: 'http://127.0.0.1:5000'
-        // });
-
+        chrome.tabs.update({  // redirect to flask-app once complete
+          url: 'http://127.0.0.1:5000'
+        });
       });
 
     });

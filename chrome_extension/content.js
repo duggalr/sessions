@@ -10,15 +10,16 @@ window.addEventListener("message", function(event) {
       var tab_id = event.data['tabID']
       console.log('removing tab-id:', tab_id)
 
-      chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {
+      chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {        
         // console.log('bckjs-res:', response)
         // TODO: 
           // update the refresh-session on delete-tab and refresh-button
-          // CRUD for sessions <-- most important (will need for tmw)
-            // work on UI
-          // verify tab-delete is successful and if so, send message to home-page to remove the tab (dom-based is easiest) 
-            // add window-delete as well
-          // refresh active windows button
+          // CRUD for sessions <-- most important (will need for tmw) (need select-all, etc.)
+            // work on UI 
+              // Organize windows with hostname-tabs
+              // show the current active window at top (mark as current)
+              // say 'minimized' for other windows
+
 
       });
 
@@ -28,7 +29,6 @@ window.addEventListener("message", function(event) {
       chrome.runtime.sendMessage({type: 'refresh_session'})
 
     }
-
 
   }
 
@@ -43,5 +43,7 @@ window.addEventListener("message", function(event) {
   // }
 
 });
+
+
 
 

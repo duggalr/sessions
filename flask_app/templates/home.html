@@ -71,15 +71,23 @@
 
   // })
 
+
+
+  // function sendMsg(data){
+  //   return new Promise(function(resolve, reject){
+  //     window.postMessage(data, "*");
+  //   })
+    
+  // }
+
+
   function deleteTab(tab_id){
 
     console.log('tab-delete:', tab_id)
-    // send tab-id to remove <-- prevent malicious requests here (ie. user sends list of tab-id's to delete upon site-visit)?
+    // TODO: prevent malicious requests here (ie. user sends list of tab-id's to delete upon site-visit)?
     var data = { type: "remove_tab", tabID: tab_id };
     window.postMessage(data, "*");
-    setTimeout(refreshSession(), 1500);
-
-    // Need to refresh the windows
+    refreshSession();
 
   }
 

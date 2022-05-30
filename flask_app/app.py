@@ -86,6 +86,7 @@ def refresh_window():
   data = request.get_json()
   for li in data:
     for di in li:
+      print('dict:', di)
       fav_url = di.get('favIconUrl', None)
       title = di['title']
       url = di['url']
@@ -96,6 +97,7 @@ def refresh_window():
       g.db.commit()
 
   return {'success': True}
+  # return redirect(url_for('home'))
 
 
 @app.route('/delete_session/<name>', methods=['GET', 'POST'])
