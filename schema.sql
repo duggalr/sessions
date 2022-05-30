@@ -1,10 +1,13 @@
 create table current_windows(
   id int primary key,
   window_id int,
+  window_state text, 
+  window_focused int,
   tab_id int,
   title text, 
   url text, 
-  fav_url text
+  fav_url text,
+  t TIMESTAMP DEFAULT (datetime('now','localtime'))
 );
 
 create table sessions(

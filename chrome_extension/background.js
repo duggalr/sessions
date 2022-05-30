@@ -26,6 +26,10 @@ function getTabData(window_di){
 
   return new Promise(function(resolve, reject){
     chrome.tabs.query({windowId: window_di['id']}, function(tabs_info){
+      // console.log('ti:', tabs_info[0])
+      tabs_info.push({'window_id': window_di['id'], 'window_state': window_di['state'], 'window_focused': window_di['focused']})
+      // tabs_info['window_state'] = window_di['state']
+      // tabs_info['window_focused'] = window_di['focused']
       // console.log('tabs-info:', tabs_info)
       resolve(tabs_info)
     })
@@ -40,8 +44,10 @@ function sendAllWindows(){
     var finalData = []
 
     for (i=0; i <= all_windows_res.length-1; i++){
+      // console.log('window-dict:', all_windows_res[i])
       finalData.push(getTabData(all_windows_res[i]))
     }
+    // TODO: group windows by current-active, open, minimized
 
     Promise.all(finalData).then(function(values) {
 
@@ -133,19 +139,6 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-
-
-
-// TODO: 
-  // do tab-CRUD
-  
-
-  // TODO: fetchWindowData and then send request/create new-tab here
-  // chrome.tabs.create({
-  //   url: 'http://127.0.0.1:5000'
-  // })
-
-// })
 
 
 

@@ -13,7 +13,6 @@ window.addEventListener("message", function(event) {
       chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {        
         // console.log('bckjs-res:', response)
         // TODO: 
-          // update the refresh-session on delete-tab and refresh-button
           // CRUD for sessions <-- most important (will need for tmw) (need select-all, etc.)
             // work on UI 
               // Organize windows with hostname-tabs

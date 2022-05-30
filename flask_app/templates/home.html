@@ -47,8 +47,8 @@
     <!-- <a href="{{ url_for('delete_session', name=session_title) }}">delete session</a> -->
     <a href="#" id="{{ session_title }}" onclick="deleteSession(this.id)">delete session</a>
     <a href="{{ url_for('open_session', name=session_title) }}">open session</a>
-    
   </h3>
+  
   <ul>
     {% for di in sessions[session_title] %}
       <li style="padding-top: 6px;">

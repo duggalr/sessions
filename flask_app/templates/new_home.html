@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- TODO: fav-icon (same as CE) -->
+    <title>Sessions</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+
+      li{
+        margin: 6px 0;
+      }
+
+      .trash:hover{
+        cursor: pointer;
+      }
+
+      #button_div{
+        padding-top: 10px;
+        /* float: left; */
+      }
+
+    </style>
+    
+
+  </head>
+
+  <body>
+
+    <!-- <button id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button> -->
+
+    <div class="ui grid container">
+
+      <div class="eight wide column">
+        <h2 style="display: inline;">Windows</h2>
+        <span style="padding-left: 10px; font-size: 16px; font-weight: 700;"> (last updated: {{ last_refreshed_timestamp }} minute(s) ago... )</span>
+        
+        <div id="button_div">
+          <button class="ui button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button>
+          <button class="ui button" id="create_session">Create Session</button>
+        </div>
+        
+
+        <h3>Focused Window:</h3>
+        <ul>
+          {% for di in focused_tabs_list %}
+            <li>
+              <a href="{{ di['url'] }}">
+                {{ di['title'] }} 
+              </a>
+              &nbsp;&nbsp;&nbsp;
+              <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+              <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
+            </li>
+          {% endfor %}
+        </ul>
+
+        <h3>Open Windows: ( {{ active_windows_dict|length }} ) </h3>
+        {% for window_id in active_windows_dict %} 
+        
+          <h4>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
+            <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
+          </h4> 
+
+          <ul>
+            {% for di in active_windows_dict[window_id] %}
+              <li>
+                <!-- <img src="{{ di['fav_url'] }}"> -->
+                <a href="{{ di['url'] }}">
+                  {{ di['title'] }} 
+                </a>
+                &nbsp;&nbsp;&nbsp;
+                <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+                <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->    
+              </li>
+            {% endfor %}
+          </ul>
+      
+        {% endfor %}
+
+        <h3>Minimized Windows: ( {{ minimized_windows_dict|length }} ) </h3>
+        {% for window_id in minimized_windows_dict %} 
+
+          <h5>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
+            <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
+          </h5> 
+          <ul>
+            {% for di in minimized_windows_dict[window_id] %}
+              <li>
+                <!-- <img src="{{ di['fav_url'] }}"> -->
+                <a href="{{ di['url'] }}">
+                  {{ di['title'] }} 
+                </a>
+                &nbsp;&nbsp;&nbsp;
+                <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+                <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
+              </li>
+              <br/>
+            {% endfor %}
+          </ul>
+      
+        {% endfor %}
+
+
+        
+
+      </div>
+      <div class="eight wide column">
+        <h2>Saved Sessions</h2>
+
+
+      </div>
+
+    </div>
+
+
+
+
+    <script>
+
+      function refreshSession(){
+
+        var data = { type: "refresh_session" };
+        window.postMessage(data, "*");
+
+      }
+
+      function deleteTab(tab_id){
+
+        console.log('tab-delete:', tab_id)
+        // TODO: prevent malicious requests here (ie. user sends list of tab-id's to delete upon site-visit)?
+        var data = { type: "remove_tab", tabID: tab_id };
+        window.postMessage(data, "*");
+        refreshSession();
+
+      }
+
+
+
+    </script>
+
+
+  </body>
+  
+</html>
+
+
+
+
+

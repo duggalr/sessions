@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 import flask
 from flask import request, render_template, g, session, redirect, url_for
 from functools import wraps
@@ -42,23 +43,72 @@ def home():
           g.db.commit()
 
 
-  sql = 'select * from current_windows'
+  sql = 'select * from current_windows where window_focused=1'
+  cur = g.db.execute(sql)
+  focused_window_tabs = cur.fetchall()
+  focused_windows_list = []
+  last_refreshed_timestamp = ''
+  for rw in focused_window_tabs:
+    # last_refreshed_timestamp = rw['t']
+    db_timestamp = rw['t']  # 2022-05-30 15:31:12
+    dt_timestamp = datetime.datetime.strptime(db_timestamp, '%Y-%m-%d %H:%M:%S')
+    ct = datetime.datetime.now()
+    td = ct - dt_timestamp
+    td_mins = int(round(td.total_seconds() / 60))
+    last_refreshed_timestamp = td_mins
+    tab_dict = utils.create_tab_dict(rw)
+    focused_windows_list.append(tab_dict)
+
+  # sql = "select * from current_windows where window_state='minimized' "
+  # cur = g.db.execute(sql)
+  # minimized_window_tabs = cur.fetchall()
+  # minimized_windows_dict = {}
+  # for rw in minimized_window_tabs:
+  #   tab_dict = utils.create_tab_dict(rw)
+  #   if window_id in minimized_windows_dict:
+  #     old_li = minimized_windows_dict[window_id]
+  #     old_li.append(tab_dict)
+  #     minimized_windows_dict[window_id] = old_li
+  #   else: 
+  #     minimized_windows_dict[window_id] = [tab_dict]
+
+  sql = 'select * from current_windows where window_focused=0'
   cur = g.db.execute(sql)
   li = cur.fetchall()
-
-  windows_dict = {}
+  minimized_windows_dict = {}
+  active_windows_dict = {}
   for rw in li:
+    tab_dict = utils.create_tab_dict(rw)
     window_id = rw['window_id']
-    tab_id = rw['tab_id']
-    tab_title = rw['title']
-    tab_url = rw['url']
-    fav_url = rw['fav_url']
-    if window_id in windows_dict:
-      old_li = windows_dict[window_id]
-      old_li.append({'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url, })
-      windows_dict[window_id] = old_li
-    else: 
-      windows_dict[window_id] = [{'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
+    if rw['window_state'] == 'minimized':
+      if window_id in minimized_windows_dict:
+        old_li = minimized_windows_dict[window_id]
+        old_li.append(tab_dict)
+        minimized_windows_dict[window_id] = old_li
+      else: 
+        minimized_windows_dict[window_id] = [tab_dict]
+    
+    else:
+      if window_id in active_windows_dict:
+        old_li = active_windows_dict[window_id]
+        old_li.append(tab_dict)
+        active_windows_dict[window_id] = old_li
+      else: 
+        active_windows_dict[window_id] = [tab_dict]
+
+  # windows_dict = {}
+  # for rw in li:
+  #   window_id = rw['window_id']
+  #   tab_id = rw['tab_id']
+  #   tab_title = rw['title']
+  #   tab_url = rw['url']
+  #   fav_url = rw['fav_url']
+  #   if window_id in windows_dict:
+  #     old_li = windows_dict[window_id]
+  #     old_li.append({'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url, })
+  #     windows_dict[window_id] = old_li
+  #   else: 
+  #     windows_dict[window_id] = [{'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
   
   sql = 'select * from sessions'
   cur = g.db.execute(sql)
@@ -74,7 +124,14 @@ def home():
       sessions_dict[session_title] = [{'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}]
 
 
-  return render_template('home.html', windows=windows_dict, sessions=sessions_dict)
+  return render_template(
+    'new_home.html', 
+    last_refreshed_timestamp=last_refreshed_timestamp,
+    focused_tabs_list=focused_windows_list,
+    minimized_windows_dict=minimized_windows_dict,
+    active_windows_dict=active_windows_dict,
+    sessions=sessions_dict
+  )
 
 
 @app.route('/refresh_windows', methods=['POST'])
@@ -85,15 +142,24 @@ def refresh_window():
   g.db.commit()
   data = request.get_json()
   for li in data:
-    for di in li:
-      print('dict:', di)
+    window_dict = li[-1]
+    window_id = window_dict['window_id']
+    window_state = window_dict['window_state']
+    window_focused = window_dict['window_focused']
+    if window_focused:
+      window_focused = 1
+    else:
+      window_focused = 0
+
+    for di in li[:-1]:
       fav_url = di.get('favIconUrl', None)
       title = di['title']
       url = di['url']
-      window_id = di['windowId']
+      # window_id = di['windowId']
       tab_id = di['id']
-      sql = 'insert into current_windows (window_id, tab_id, title, url, fav_url) values (?, ?, ?, ?, ?)'
-      g.db.execute(sql, (window_id, tab_id, title, url, fav_url,))
+
+      sql = 'insert into current_windows (window_id, window_state, window_focused, tab_id, title, url, fav_url) values (?, ?, ?, ?, ?, ?, ?)'
+      g.db.execute(sql, (window_id, window_state, window_focused, tab_id, title, url, fav_url,))
       g.db.commit()
 
   return {'success': True}
