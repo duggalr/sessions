@@ -279,6 +279,7 @@
       }
 
 
+      // Create new session
       $( "#session_form" ).submit(function( event ) {
         event.preventDefault();
 
@@ -381,40 +382,68 @@
       }
 
 
+      // Update new session
       $( "#submit_session_button" ).click(function( event ) {
         event.preventDefault();
 
-        // var session_name = $('#session_name_input_update').children('input')[0].value
-        var window_id_list = []
-        var tab_id_list = []
+        // // var session_name = $('#session_name_input_update').children('input')[0].value
+        // var window_id_list = []
+        // var tab_id_list = []
+        // $('input:checkbox:checked').each(function(){
+        //   console.log('val:', this.checked, $(this).val(), this.name)
+        //   var checkbox_name = this.name
+        //   if (checkbox_name.includes('window')){
+        //     window_id_list.push($(this).val())
+        //   } else {
+        //     tab_id_list.push($(this).val())
+        //   }
+        // })
+
+        // var final_dict = {'session_name': currentUpdateSesssionTitle, 'window_id_list': window_id_list, 'tab_id_list': tab_id_list}
+        // console.log('final-dict:', final_dict)
+
+
+        var window_dict = {}
         $('input:checkbox:checked').each(function(){
-          console.log('val:', this.checked, $(this).val(), this.name)
-          var checkbox_name = this.name
-          if (checkbox_name.includes('window')){
-            window_id_list.push($(this).val())
-          } else {
-            tab_id_list.push($(this).val())
+      
+          var cb_elem = $($(this)[0])
+          if (cb_elem.attr('class') != 'select-all-cb'){
+            
+            var tab_id = cb_elem.val()
+            var window_id = cb_elem.parent().find($('input'))[1].value
+            if (window_dict[window_id] === undefined){
+              window_dict[window_id] = [tab_id]
+            } else {
+              var old_li = window_dict[window_id]
+              old_li.push(tab_id)
+              window_dict[window_id] = old_li
+            }
+            
           }
+
+          // console.log('val:', this.checked, $(this).val())
+          // var window_id = $(this).val()
+          // window_id_list.push(window_id)
         })
 
-        var final_dict = {'session_name': currentUpdateSesssionTitle, 'window_id_list': window_id_list, 'tab_id_list': tab_id_list}
+        var final_dict = {'session_name': currentUpdateSesssionTitle, 'window_dict': window_dict}
         console.log('final-dict:', final_dict)
 
-        // $.ajax({
-        //   url : "/update_session",
-        //   type: "POST",
-        //   contentType: 'application/json',
-        //   dataType : 'json',
-        //   data : JSON.stringify(final_dict),
-        //   success: function(res){
-        //     window.location = '/'
-        //     // if (res['success'] === true){
-        //     //   window.location = '/'
-        //     // } else {
-        //     //   $('#error_message').show()
-        //     // }
-        //   }
-        // });
+        $.ajax({
+          url : "/update_session",
+          type: "POST",
+          contentType: 'application/json',
+          dataType : 'json',
+          data : JSON.stringify(final_dict),
+          success: function(res){
+            window.location = '/'
+            // if (res['success'] === true){
+            //   window.location = '/'
+            // } else {
+            //   $('#error_message').show()
+            // }
+          }
+        });
 
 
       })
@@ -446,4 +475,11 @@
 
 
 
+<!-- 
+  TODO:  
+    // test/fix the CRUD for sessions 
+    // test/fix the CRUD for tabs
+    // **need to write good tests before doing anything else for above**
+
+-->
 
