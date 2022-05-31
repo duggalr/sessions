@@ -13,10 +13,13 @@ window.addEventListener("message", function(event) {
       chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {        
         // console.log('bckjs-res:', response)
         // TODO: 
-          // for update-session, have ability to add links to existing session**
-            // also, have ability to remove specific urls from an existing session
+          // test/fix the CRUD for tabs
+            // Fix Delete
+              // ability delete window as well
+            // Click on Tab or Window: 
+              // It should bring focus to that tab/window
+
           // open session 
-          // delete-tab functionality
           // **need to write basic functionality tests for flask-api and JS <-- constantly adding new features; will make it alot faster
 
           // usage <-- see any other features would be useful <-- want this to feel like tmux
