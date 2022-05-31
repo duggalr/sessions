@@ -88,6 +88,10 @@
               </a>
               &nbsp;&nbsp;&nbsp;
               <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+              <div class="ui checkbox" style="padding-left: 5px">
+                <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
+                <label></label>
+              </div>
               <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
 
             </li>
@@ -117,6 +121,10 @@
                 &nbsp;&nbsp;&nbsp;
                 <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
                 <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->    
+                <div class="ui checkbox" style="padding-left: 5px">
+                  <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
+                  <label></label>
+                </div>
               </li>
             {% endfor %}
           </ul>
@@ -146,6 +154,11 @@
                 &nbsp;&nbsp;&nbsp;
                 <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
                 <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
+                <div class="ui checkbox" style="padding-left: 5px">
+                  <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
+                  <label></label>
+                </div>
+
               </li>
               <br/>
             {% endfor %}
@@ -153,8 +166,6 @@
       
         {% endfor %}
 
-
-        
 
       </div>
 
@@ -343,30 +354,35 @@
 
         // var session_name = $('#session_name_input_update').children('input')[0].value
         var window_id_list = []
+        var tab_id_list = []
         $('input:checkbox:checked').each(function(){
-          // console.log('val:', this.checked, $(this).val())
-          var window_id = $(this).val()
-          window_id_list.push(window_id)
+          console.log('val:', this.checked, $(this).val(), this.name)
+          var checkbox_name = this.name
+          if (checkbox_name.includes('window')){
+            window_id_list.push($(this).val())
+          } else {
+            tab_id_list.push($(this).val())
+          }
         })
 
-        var final_dict = {'session_name': currentUpdateSesssionTitle, 'window_id_list': window_id_list}
+        var final_dict = {'session_name': currentUpdateSesssionTitle, 'window_id_list': window_id_list, 'tab_id_list': tab_id_list}
         console.log('final-dict:', final_dict)
 
-        $.ajax({
-          url : "/update_session",
-          type: "POST",
-          contentType: 'application/json',
-          dataType : 'json',
-          data : JSON.stringify(final_dict),
-          success: function(res){
-            window.location = '/'
-            // if (res['success'] === true){
-            //   window.location = '/'
-            // } else {
-            //   $('#error_message').show()
-            // }
-          }
-        });
+        // $.ajax({
+        //   url : "/update_session",
+        //   type: "POST",
+        //   contentType: 'application/json',
+        //   dataType : 'json',
+        //   data : JSON.stringify(final_dict),
+        //   success: function(res){
+        //     window.location = '/'
+        //     // if (res['success'] === true){
+        //     //   window.location = '/'
+        //     // } else {
+        //     //   $('#error_message').show()
+        //     // }
+        //   }
+        // });
 
 
       })

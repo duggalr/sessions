@@ -229,6 +229,7 @@ def update_session():
   print('length-sessions:', existing_sessions)
   if len(existing_sessions) >= 1:
     window_ids = data['window_id_list']
+    tab_ids = data['tab_id_list']
     for wid in window_ids:
       sql = 'select title, url from current_windows where window_id = ?'
       cur = g.db.execute(sql, (wid,))
