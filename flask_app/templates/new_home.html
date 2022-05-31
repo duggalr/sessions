@@ -82,7 +82,7 @@
                   {{ di['title'] }} 
                 </a>
                 &nbsp;&nbsp;&nbsp;
-                <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+                <!-- <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i> -->
                 <div class="ui checkbox" style="padding-left: 5px">
                   <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
                   <input name="window_id" type="hidden" value="{{ focused_window_id }}">
@@ -120,7 +120,7 @@
                       {{ di['title'] }} 
                     </a>
                     &nbsp;&nbsp;&nbsp;
-                    <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+                    <!-- <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i> -->
                     <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->    
                     <div class="ui checkbox" style="padding-left: 5px">
                       <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
@@ -201,7 +201,7 @@
             &nbsp;&nbsp;&nbsp;
             <div>
               <button id="submit_session_button" class="tiny ui blue button" style="display: none;">Save Changes</button>
-              <button class="tiny ui button">Open Session</button>
+              <button class="tiny ui button" onclick="openSession(this)">Open Session</button>
               <button id="{{ session_title }}" class="tiny ui button update" onclick="updateSession(this.id)">Update Session</button>
               <button id="{{ session_title }}" class="tiny ui button" onclick="deleteSession(this.id)">Delete Session</button>
 
@@ -263,10 +263,11 @@
       function deleteTab(tab_id){
 
         console.log('tab-delete:', tab_id)
-        // TODO: prevent malicious requests here (ie. user sends list of tab-id's to delete upon site-visit)?
         var data = { type: "remove_tab", tabID: tab_id };
         window.postMessage(data, "*");
-        // refreshSession();
+
+        // TODO: why is it not updating the new tabs? 
+        // setTimeout(refreshSession(), 6000);
 
       }
 
@@ -344,8 +345,8 @@
         return false;
       }
 
-      var currentUpdateSesssionTitle;
 
+      var currentUpdateSesssionTitle;
       function updateSession(session_title){
         currentUpdateSesssionTitle = session_title
 
@@ -449,6 +450,7 @@
       })
 
 
+      // CB select all toggle
       $('.select-all-cb').click(function(){
 
         var header_elem = $(this).parent().parent()
@@ -461,8 +463,24 @@
 
       })
       
-      
 
+
+      var sessions_dict = {{ sessions|tojson }}
+      // console.log({{ sessions|tojson }})
+      // var sessions_dict = JSON.parse('{{ sessions }}')
+      // console.log(sessions_dict)
+      // 
+      
+      function openSession(elem){
+        var session_name = $(elem).parent().parent().find('h3')[0].innerHTML.trim()
+        console.log('name:', session_name, sessions_dict['asdkadj'])
+        var session_val = sessions_dict[session_name]
+        if (session_val != undefined){
+          var data = { type: "open_session", data: session_val };
+          window.postMessage(data, "*");
+        }
+
+      }
 
 
     </script>
@@ -474,11 +492,6 @@
 
 
 
-
-<!-- 
-  TODO:  
-    
--->
 
 
 

@@ -134,9 +134,25 @@ chrome.runtime.onMessage.addListener(
     else if (request['type'] == 'refresh_session'){
       sendAllWindows()
     }
+    else if (request['type'] == 'open_session'){
+
+      var data = request['data']
+      for (k in data) {
+        var tabsArr = data[k]
+        var tab_url_list = []
+        for (i=0; i <= tabsArr.length-1; i++){
+          tab_url_list.push(tabsArr[i]['tab_url'])
+        }
+        chrome.windows.create({'url': tab_url_list}, function(res){
+          console.log('wc-res:', res)
+        })
+      }
+
+    }
 
   }
 );
+
 
 
 

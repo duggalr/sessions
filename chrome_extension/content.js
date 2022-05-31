@@ -10,29 +10,30 @@ window.addEventListener("message", function(event) {
       var tab_id = event.data['tabID']
       console.log('removing tab-id:', tab_id)
 
-      chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {        
+      chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {  
+
         // console.log('bckjs-res:', response)
         // TODO: 
-          // test/fix the CRUD for tabs
-            // Fix Delete
-              // ability delete window as well
-            // Click on Tab or Window: 
-              // It should bring focus to that tab/window
-
           // open session 
-          // **need to write basic functionality tests for flask-api and JS <-- constantly adding new features; will make it alot faster
 
           // usage <-- see any other features would be useful <-- want this to feel like tmux
             // potentially desktop as we continue using it
-          // after: start the BM-explorations 
+          // after: 
+            // start the BM-explorations 
       });
 
     }
 
     else if (event.data.type == 'refresh_session'){
       chrome.runtime.sendMessage({type: 'refresh_session'})
+    }
+
+    else if (event.data.type == 'open_session'){
+      // console.log('d:', event)
+      chrome.runtime.sendMessage({type: 'open_session', 'data': event.data.data}, function(response){})
 
     }
+
 
   }
 
