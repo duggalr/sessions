@@ -13,9 +13,11 @@ window.addEventListener("message", function(event) {
       chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {        
         // console.log('bckjs-res:', response)
         // TODO: 
+          // for update-session, have ability to add links to existing session**
+            // also, have ability to remove specific urls from an existing session
           // open session 
-          // delete functionality
-          // usage <-- see any other features would be useful 
+          // delete-tab functionality
+          // usage <-- see any other features would be useful <-- want this to feel like tmux
             // potentially desktop as we continue using it
           // after: start the BM-explorations 
       });
