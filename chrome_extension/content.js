@@ -17,6 +17,8 @@ window.addEventListener("message", function(event) {
             // also, have ability to remove specific urls from an existing session
           // open session 
           // delete-tab functionality
+          // **need to write basic functionality tests for flask-api and JS <-- constantly adding new features; will make it alot faster
+
           // usage <-- see any other features would be useful <-- want this to feel like tmux
             // potentially desktop as we continue using it
           // after: start the BM-explorations 

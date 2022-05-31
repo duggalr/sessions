@@ -39,15 +39,27 @@ def save_session():
   existing_sessions = cur.fetchall()
   print('length-sessions:', existing_sessions)
   if len(existing_sessions) == 0:
-    window_ids = form_data['window_id_list']
-    for wid in window_ids:
-      sql = 'select title, url from current_windows where window_id = ?'
-      cur = g.db.execute(sql, (wid,))
-      window_tabs = cur.fetchall()
-      for rw in window_tabs:
+    window_dict = form_data['window_dict']
+    for wid in window_dict:
+      tab_ids = window_dict[wid]
+      for tid in tab_ids:
+        sql = 'select title, url from current_windows where window_id = ? and tab_id = ?'
+        cur = g.db.execute(sql, (wid, tid,))
+        tab_data = cur.fetchone()
+
         sql = 'insert into sessions (session_title, window_id, tab_title, tab_url) values (?, ?, ?, ?)'
-        g.db.execute(sql, (session_name, wid, rw['title'], rw['url']))
+        g.db.execute(sql, (session_name, wid, tab_data['title'], tab_data['url']))
         g.db.commit()
+
+  #   window_ids = form_data['window_id_list']
+  #   for wid in window_ids:
+  #     sql = 'select title, url from current_windows where window_id = ?'
+  #     cur = g.db.execute(sql, (wid,))
+  #     window_tabs = cur.fetchall()
+  #     for rw in window_tabs:
+  #       sql = 'insert into sessions (session_title, window_id, tab_title, tab_url) values (?, ?, ?, ?)'
+  #       g.db.execute(sql, (session_name, wid, rw['title'], rw['url']))
+  #       g.db.commit()
 
     return {'success': True}
 

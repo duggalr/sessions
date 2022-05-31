@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
   <head>
     <!-- TODO: fav-icon (same as CE) -->
     <title>Sessions</title>
@@ -64,107 +65,123 @@
         </form>
 
 
-        <div style="display: inline-flex; padding-top: 10px; ">
-          <h3>
+        <div>
+
+          <h3 id="focused_window_header">
             Focused Window:
             <div class="ui checkbox" style="padding-left: 5px">
-              <input name="window_{{ focused_window_id }}" type="checkbox" value="{{ focused_window_id }}">
-              <label>(save all)</label>
+              <input class="select-all-cb" name="window_{{ focused_window_id }}" type="checkbox" value="{{ focused_window_id }}">
+              <label>(select all)</label>
             </div>
           </h3>
-          <!-- &nbsp;
-          <div class="ui checkbox">
-            <input name="window_{{ focused_window_id }}" type="checkbox" value="{{ focused_window_id }}">
-            <label>(save all)</label>
-          </div> -->
+
+          <ul>
+            {% for di in focused_tabs_list %}
+              <li>
+                <a href="{{ di['url'] }}">
+                  {{ di['title'] }} 
+                </a>
+                &nbsp;&nbsp;&nbsp;
+                <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+                <div class="ui checkbox" style="padding-left: 5px">
+                  <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
+                  <input name="window_id" type="hidden" value="{{ focused_window_id }}">
+                  <label></label>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
 
         </div>
-        
-        <ul>
-          {% for di in focused_tabs_list %}
-            <li>
-              <a href="{{ di['url'] }}">
-                {{ di['title'] }} 
-              </a>
-              &nbsp;&nbsp;&nbsp;
-              <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
-              <div class="ui checkbox" style="padding-left: 5px">
-                <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
-                <label></label>
-              </div>
-              <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
 
-            </li>
+
+        <div>
+
+          <h3>Open Windows: ( {{ active_windows_dict|length }} ) </h3>
+          {% for window_id in active_windows_dict %} 
+          
+            <div>
+
+              <h4>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
+                &nbsp;
+                <div class="ui checkbox" style="padding-left: 5px">
+                  <input class="select-all-cb" name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
+                  <label>(save all)</label>
+                </div>
+                <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
+              </h4> 
+    
+              <ul>
+                {% for di in active_windows_dict[window_id] %}
+                  <li>
+                    <!-- <img src="{{ di['fav_url'] }}"> -->
+                    <a href="{{ di['url'] }}">
+                      {{ di['title'] }} 
+                    </a>
+                    &nbsp;&nbsp;&nbsp;
+                    <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+                    <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->    
+                    <div class="ui checkbox" style="padding-left: 5px">
+                      <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
+                      <input name="window_id" type="hidden" value="{{ window_id }}">
+                      <label></label>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+
+            </div>
+        
+        
           {% endfor %}
-        </ul>
 
-        <h3>Open Windows: ( {{ active_windows_dict|length }} ) </h3>
-        {% for window_id in active_windows_dict %} 
+        </div>
+
+
+        <div>
+
+          <h3>Minimized Windows: ( {{ minimized_windows_dict|length }} ) </h3>
+          {% for window_id in minimized_windows_dict %} 
+  
+            <div>
+            
+              <h4>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
+                &nbsp;
+                <div class="ui checkbox">
+                  <input class="select-all-cb" name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
+                  <label>(save all)</label>
+                </div>
+                <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
+              </h4> 
+    
+              <ul>
+                {% for di in minimized_windows_dict[window_id] %}
+                  <li>
+                    <!-- <img src="{{ di['fav_url'] }}"> -->
+                    <a href="{{ di['url'] }}">
+                      {{ di['title'] }} 
+                    </a>
+                    &nbsp;&nbsp;&nbsp;
+                    <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
+                    <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
+                    <div class="ui checkbox" style="padding-left: 5px">
+                      <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
+                      <input name="window_id" type="hidden" value="{{ window_id }}">
+                      <label></label>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            
+            </div>
         
-          <h4>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
-            &nbsp;
-            <div class="ui checkbox" style="padding-left: 5px">
-              <input name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
-              <label>(save all)</label>
-            </div>
-            <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
-          </h4> 
+          {% endfor %}
 
-          <ul>
-            {% for di in active_windows_dict[window_id] %}
-              <li>
-                <!-- <img src="{{ di['fav_url'] }}"> -->
-                <a href="{{ di['url'] }}">
-                  {{ di['title'] }} 
-                </a>
-                &nbsp;&nbsp;&nbsp;
-                <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
-                <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->    
-                <div class="ui checkbox" style="padding-left: 5px">
-                  <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
-                  <label></label>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-      
-        {% endfor %}
+        </div>
 
-        <h3>Minimized Windows: ( {{ minimized_windows_dict|length }} ) </h3>
-        {% for window_id in minimized_windows_dict %} 
-
-          <h5>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Window {{ window_id }}
-            &nbsp;
-            <div class="ui checkbox">
-              <input name="window_{{ window_id }}" type="checkbox" value="{{ window_id }}">
-              <label>(save all)</label>
-            </div>
-            <!-- <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}"> -->
-          </h5> 
-
-          <ul>
-            {% for di in minimized_windows_dict[window_id] %}
-              <li>
-                <!-- <img src="{{ di['fav_url'] }}"> -->
-                <a href="{{ di['url'] }}">
-                  {{ di['title'] }} 
-                </a>
-                &nbsp;&nbsp;&nbsp;
-                <i id="{{ di['tab_id'] }}" class="trash alternate outline icon" onclick="deleteTab(this.id)"></i>
-                <!-- <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button> -->
-                <div class="ui checkbox" style="padding-left: 5px">
-                  <input name="tab_{{ di['tab_id'] }}" type="checkbox" value="{{ di['tab_id'] }}">
-                  <label></label>
-                </div>
-
-              </li>
-              <br/>
-            {% endfor %}
-          </ul>
-      
-        {% endfor %}
+   
 
 
       </div>
@@ -265,15 +282,32 @@
       $( "#session_form" ).submit(function( event ) {
         event.preventDefault();
 
-        var window_id_list = []
+        // var window_id_list = []
+        var window_dict = {}
         $('input:checkbox:checked').each(function(){
+      
+          var cb_elem = $($(this)[0])
+          if (cb_elem.attr('class') != 'select-all-cb'){
+            
+            var tab_id = cb_elem.val()
+            var window_id = cb_elem.parent().find($('input'))[1].value
+            if (window_dict[window_id] === undefined){
+              window_dict[window_id] = [tab_id]
+            } else {
+              var old_li = window_dict[window_id]
+              old_li.push(tab_id)
+              window_dict[window_id] = old_li
+            }
+            
+          }
+
           // console.log('val:', this.checked, $(this).val())
-          var window_id = $(this).val()
-          window_id_list.push(window_id)
+          // var window_id = $(this).val()
+          // window_id_list.push(window_id)
         })
-        
+
         var session_name = $('#session_name').val()
-        var final_dict = {'session_name': session_name, 'window_id_list': window_id_list}
+        var final_dict = {'session_name': session_name, 'window_dict': window_dict}
         console.log('final-dict:', final_dict)
     
         $.ajax({
@@ -288,9 +322,7 @@
               } else {
                 $('#error_message').show()
               }
-            
           }
-          
         });
 
       });
@@ -386,6 +418,20 @@
 
 
       })
+
+
+      $('.select-all-cb').click(function(){
+
+        var header_elem = $(this).parent().parent()
+        // var header_elem_id = header_elem[0].id
+        var mainDiv = header_elem.parent()
+        var allElements = mainDiv.children('ul')
+        allElements.find('input:checkbox').each(function(index, elem){
+          $(elem).trigger('click')
+        })
+
+      })
+      
       
 
 
