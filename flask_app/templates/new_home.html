@@ -37,10 +37,13 @@
 
   <body>
 
-    <div class="ui grid container" style="padding-top: 25px">
+    <div class="ui grid container" style="padding-top: 50px">
 
       <div class="eight wide column">
-        <h2 style="display: inline;">Windows</h2>
+        <h2 style="display: inline;">
+          <i class="tablet alternate icon"></i>
+          Windows
+        </h2>
         <span style="padding-left: 10px; font-size: 16px; font-weight: 700; "> (last updated: {{ last_refreshed_timestamp }} minute(s) ago... )</span>
         
         <div id="button_div">
@@ -64,6 +67,7 @@
 
         </form>
 
+        <br/>
 
         <div>
 
@@ -94,6 +98,7 @@
 
         </div>
 
+        <br/>
 
         <div>
 
@@ -138,6 +143,7 @@
 
         </div>
 
+        <br/>
 
         <div style="padding-top: 20px;">
 
@@ -187,7 +193,10 @@
       </div>
 
       <div class="eight wide column">
-        <h2>Saved Sessions</h2>
+        <h2>
+          <i class="save outline icon"></i>
+          Saved Sessions
+        </h2>
 
         {% for session_title in sessions %}
 

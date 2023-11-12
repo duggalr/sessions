@@ -9,7 +9,7 @@ import utils
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
-app.config["DATABASE"] = '/Users/rahul/Documents/main/projects/personal_learning_projects/sessions/main.db'
+app.config["DATABASE"] = '/Users/rahul/Desktop/sessions/main.db'
 
 def connect_db():
   sqlite_db = sqlite3.connect(app.config["DATABASE"])
@@ -177,15 +177,26 @@ def home():
     sessions_dict[session_title] = session_window_dict
 
 
-  return render_template(
-    'new_home.html', 
-    last_refreshed_timestamp=last_refreshed_timestamp,
-    focused_window_id=focused_window_tabs[0]['window_id'],
-    focused_tabs_list=focused_windows_list,
-    minimized_windows_dict=minimized_windows_dict,
-    active_windows_dict=active_windows_dict,
-    sessions=sessions_dict
-  )
+  if len(focused_windows_list) > 0:
+    return render_template(
+      'new_home.html', 
+      last_refreshed_timestamp=last_refreshed_timestamp,
+      focused_window_id=focused_window_tabs[0]['window_id'],
+      focused_tabs_list=focused_windows_list,
+      minimized_windows_dict=minimized_windows_dict,
+      active_windows_dict=active_windows_dict,
+      sessions=sessions_dict
+    )
+  else:
+    return render_template(
+      'new_home.html', 
+      last_refreshed_timestamp=last_refreshed_timestamp,
+      focused_window_id='',
+      focused_tabs_list=focused_windows_list,
+      minimized_windows_dict=minimized_windows_dict,
+      active_windows_dict=active_windows_dict,
+      sessions=sessions_dict
+    )
 
 
 @app.route('/refresh_windows', methods=['POST'])
