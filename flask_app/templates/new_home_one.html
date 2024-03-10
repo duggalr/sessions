@@ -24,6 +24,12 @@
                 padding-top: 15px !important;
             }
 
+            .ui.menu .active.item{
+                font-weight: bold;
+                text-decoration: underline;
+                background: none !important;
+            }
+            
             .top-menu .item{
                 font-size: 15px;
                 /* padding-top: 10px; */
@@ -90,7 +96,10 @@
                     &nbsp;
 
                     <div style="float: right;">
-                        <div class="ui animated small button" tabindex="0">
+
+                        <button class="ui small button" id="refresh_active_sessions" onclick="refreshSession()">Refresh</button>
+                        &nbsp;
+                        <div class="ui animated small black button" tabindex="0">
                             <div class="visible content">next</div>
                             <div class="hidden content">
                               <i class="right arrow icon"></i>
@@ -102,19 +111,38 @@
 
             </div>
 
-            <div class="ui card" style="width: 100%; margin-top: 5.5%;">
+            <div class="ui card" style="width: 100%; margin-top: 6.5%;">
                 
                 <div class="content">
                     <h2 class="ui sub header" style="font-size: 16px;">
                         Tabs
-                        <a class="ui blue label" style="float: right; font-size: 12px;">active</a>
+                        <a class="ui blue label" style="float: right;">active window</a>
                     </h2>
                 </div>
 
                 <div class="content">
 
-                    <!-- <h4 class="ui sub header">Tabs</h4> -->
+                    <!-- <h4 class="ui sub header">Active Window</h4> -->
                     <div class="ui small feed" >
+
+                        <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
+                            <div class="content">
+                                <div class="summary">
+                                    <i class="chrome icon"></i>
+                                    <a href="" style="font-size: 15px;">
+                                        Semantic UI
+                                    </a>
+                                    <span style="color: gray; padding-left: 5px; font-size: 13px;">
+                                        (https://semantic-ui.com/elements/icon.html)
+                                    </span>
+                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;">
+                                        <i class="trash alternate outline icon"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="border-bottom: 0.5px solid lightgrey;"></div>
 
                         <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
                             <div class="content">
@@ -260,21 +288,17 @@
 
     </div>
 
-    <!-- <div class="ui grid container" >
-        
-        <div class="one wide column"></div>
 
-        <div class="fourteen wide column" style="margin-top: 10px;">
+    <script>
 
-            <h3 class="ui header">Active Windows</h3>
+        function refreshSession(){
 
+            var data = { type: "refresh_session" };
+            window.postMessage(data, "*");
 
-        </div>
+        }
 
-        <div class="one wide column"></div>
-
-    </div> -->
-
+    </script>
 
 </body>
 

@@ -85,6 +85,25 @@ def save_session():
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+
+  cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+  
+  sql = 'select * from current_windows where window_focused=1'
+  cur.execute(sql)
+  focused_window_tabs = cur.fetchall()
+  focused_windows_list = []
+  last_refreshed_timestamp = ''
+  for rw in focused_window_tabs:
+    dt_timestamp = rw['created_at']
+    ct = datetime.datetime.now()
+    td = ct - dt_timestamp
+    td_mins = int(round(td.total_seconds() / 60))
+    last_refreshed_timestamp = td_mins
+    tab_dict = utils.create_tab_dict(rw)
+    focused_windows_list.append(tab_dict)
+
+  print(focused_windows_list)
+
   return render_template(
     'new_home_one.html',
   )
