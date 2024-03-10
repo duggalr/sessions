@@ -9,7 +9,7 @@ import utils
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
-app.config["DATABASE"] = '/Users/rahul/Desktop/sessions/main.db'
+app.config["DATABASE"] = 'main.db'
 
 def connect_db():
   sqlite_db = sqlite3.connect(app.config["DATABASE"])
