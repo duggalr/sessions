@@ -1,3 +1,4 @@
 flask_app/__pycache__
+flask_app/.env
 main.db
 sessions_venv

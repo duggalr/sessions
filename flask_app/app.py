@@ -1,5 +1,8 @@
-import sqlite3
+import os
+# import sqlite3
 import datetime
+import psycopg2
+import psycopg2.extras
 import flask
 from flask import request, render_template, g, session, redirect, url_for
 from functools import wraps
@@ -7,14 +10,23 @@ from functools import wraps
 import utils
 
 
+
+
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
-app.config["DATABASE"] = 'main.db'
+
 
 def connect_db():
-  sqlite_db = sqlite3.connect(app.config["DATABASE"])
-  sqlite_db.row_factory = sqlite3.Row # to return dicts rather than tuples
-  return sqlite_db
+  conn = psycopg2.connect(
+    host = "localhost",
+    database = os.environ['LOCAL_DB_NAME'],
+    user = os.environ['LOCAL_DB_USER'],
+    password = os.environ['LOCAL_DB_PASSWORD']
+  )
+  # # Open a cursor to perform database operations
+  # cur = conn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+  # return cur
+  return conn
 
 @app.before_request
 def before_request():
@@ -27,7 +39,6 @@ def teardown_request(exception):
     db.close()
 
 
-
 @app.route('/save-session', methods=['POST'])
 def save_session():
   print('data:', request.get_json())
@@ -35,8 +46,10 @@ def save_session():
   session_name = form_data['session_name']
   
   sql = 'select * from sessions where session_title = ?'
-  cur = g.db.execute(sql, (session_name,))
-  existing_sessions = cur.fetchall()
+  cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+  cur.execute(sql, (session_name,))
+  existing_sessions = g.db.fetchall()
+
   print('length-sessions:', existing_sessions)
   if len(existing_sessions) == 0:
     window_dict = form_data['window_dict']
@@ -68,143 +81,118 @@ def save_session():
 
 
 
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
-  # if request.method == 'POST':
-  #   print(request.form)
-    # session_name = request.form.get('session_name')
-    # for key, val in request.form.items():
-    #   if key.startswith("window"):
-    #     sql = 'select title, url from current_windows where window_id = ?'
-    #     cur = g.db.execute(sql, (val,))
-    #     window_tabs = cur.fetchall()
-    #     for rw in window_tabs:
-    #       sql = 'insert into sessions (session_title, tab_title, tab_url) values (?, ?, ?)'
-    #       g.db.execute(sql, (session_name, rw['title'], rw['url']))
-    #       g.db.commit()
+  return render_template(
+    'new_home_one.html',
+  )
 
 
-  sql = 'select * from current_windows where window_focused=1'
-  cur = g.db.execute(sql)
-  focused_window_tabs = cur.fetchall()
-  focused_windows_list = []
-  last_refreshed_timestamp = ''
-  for rw in focused_window_tabs:
-    # last_refreshed_timestamp = rw['t']
-    db_timestamp = rw['t']  # 2022-05-30 15:31:12
-    dt_timestamp = datetime.datetime.strptime(db_timestamp, '%Y-%m-%d %H:%M:%S')
-    ct = datetime.datetime.now()
-    td = ct - dt_timestamp
-    td_mins = int(round(td.total_seconds() / 60))
-    last_refreshed_timestamp = td_mins
-    tab_dict = utils.create_tab_dict(rw)
-    focused_windows_list.append(tab_dict)
+# @app.route('/', methods=['GET', 'POST'])
+# def home():
 
-  # sql = "select * from current_windows where window_state='minimized' "
-  # cur = g.db.execute(sql)
-  # minimized_window_tabs = cur.fetchall()
-  # minimized_windows_dict = {}
-  # for rw in minimized_window_tabs:
-  #   tab_dict = utils.create_tab_dict(rw)
-  #   if window_id in minimized_windows_dict:
-  #     old_li = minimized_windows_dict[window_id]
-  #     old_li.append(tab_dict)
-  #     minimized_windows_dict[window_id] = old_li
-  #   else: 
-  #     minimized_windows_dict[window_id] = [tab_dict]
+#   cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
-  sql = 'select * from current_windows where window_focused=0'
-  cur = g.db.execute(sql)
-  li = cur.fetchall()
-  minimized_windows_dict = {}
-  active_windows_dict = {}
-  for rw in li:
-    tab_dict = utils.create_tab_dict(rw)
-    window_id = rw['window_id']
-    if rw['window_state'] == 'minimized':
-      if window_id in minimized_windows_dict:
-        old_li = minimized_windows_dict[window_id]
-        old_li.append(tab_dict)
-        minimized_windows_dict[window_id] = old_li
-      else: 
-        minimized_windows_dict[window_id] = [tab_dict]
+#   sql = 'select * from current_windows where window_focused=1'
+#   cur.execute(sql)
+#   focused_window_tabs = cur.fetchall()
+#   focused_windows_list = []
+#   last_refreshed_timestamp = ''
+#   for rw in focused_window_tabs:
+#     dt_timestamp = rw['created_at']  # 2022-05-30 15:31:12
+#     # dt_timestamp = datetime.datetime.strptime(db_timestamp, '%Y-%m-%d %H:%M:%S')
+#     ct = datetime.datetime.now()
+#     td = ct - dt_timestamp
+#     td_mins = int(round(td.total_seconds() / 60))
+#     last_refreshed_timestamp = td_mins
+#     tab_dict = utils.create_tab_dict(rw)
+#     focused_windows_list.append(tab_dict)
+
+#   sql = 'select * from current_windows where window_focused=0'
+#   cur.execute(sql)
+#   li = cur.fetchall()
+#   minimized_windows_dict = {}
+#   active_windows_dict = {}
+#   for rw in li:
+#     tab_dict = utils.create_tab_dict(rw)
+#     window_id = rw['window_id']
+#     if rw['window_state'] == 'minimized':
+#       if window_id in minimized_windows_dict:
+#         old_li = minimized_windows_dict[window_id]
+#         old_li.append(tab_dict)
+#         minimized_windows_dict[window_id] = old_li
+#       else: 
+#         minimized_windows_dict[window_id] = [tab_dict]
     
-    else:
-      if window_id in active_windows_dict:
-        old_li = active_windows_dict[window_id]
-        old_li.append(tab_dict)
-        active_windows_dict[window_id] = old_li
-      else: 
-        active_windows_dict[window_id] = [tab_dict]
+#     else:
+#       if window_id in active_windows_dict:
+#         old_li = active_windows_dict[window_id]
+#         old_li.append(tab_dict)
+#         active_windows_dict[window_id] = old_li
+#       else: 
+#         active_windows_dict[window_id] = [tab_dict]
 
-  # windows_dict = {}
-  # for rw in li:
-  #   window_id = rw['window_id']
-  #   tab_id = rw['tab_id']
-  #   tab_title = rw['title']
-  #   tab_url = rw['url']
-  #   fav_url = rw['fav_url']
-  #   if window_id in windows_dict:
-  #     old_li = windows_dict[window_id]
-  #     old_li.append({'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url, })
-  #     windows_dict[window_id] = old_li
-  #   else: 
-  #     windows_dict[window_id] = [{'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
-  
-  sql = 'select session_title from sessions order by timestamp desc'
-  cur = g.db.execute(sql)
-  sessions_li = cur.fetchall()
-  sessions_dict = {}
-  for rw in sessions_li:
-    session_title = rw['session_title']
-    # for each session_title, get all rows; create window-dict for each session and save in final sessions_dict
-      # display each session with window-blocks
-    all_windows_query = 'select * from sessions where session_title=?'
-    cur = g.db.execute(all_windows_query, (session_title,))
-    all_windows = cur.fetchall()
+#   sql = 'select session_title from sessions order by created_at desc'
+#   cur.execute(sql)
+#   sessions_li = cur.fetchall()
+#   sessions_dict = {}
+#   for rw in sessions_li:
+#     session_title = rw['session_title']
+#     # for each session_title, get all rows; create window-dict for each session and save in final sessions_dict
+#       # display each session with window-blocks
+#     all_windows_query = 'select * from sessions where session_title=?'
+#     cur.execute(all_windows_query, (session_title,))
+#     all_windows = cur.fetchall()
     
-    session_window_dict = {}
-    for rw in all_windows:
-      window_id = rw['window_id']
-      if window_id in session_window_dict:
-        old_li = session_window_dict[window_id]
-        tab_dict = {'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}
-        old_li.append(tab_dict)
-        session_window_dict[window_id] = old_li
-      else:
-        session_window_dict[window_id] = [{'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}]
+#     session_window_dict = {}
+#     for rw in all_windows:
+#       window_id = rw['window_id']
+#       if window_id in session_window_dict:
+#         old_li = session_window_dict[window_id]
+#         tab_dict = {'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}
+#         old_li.append(tab_dict)
+#         session_window_dict[window_id] = old_li
+#       else:
+#         session_window_dict[window_id] = [{'tab_title': rw['tab_title'], 'tab_url': rw['tab_url'], 'fav_url': rw['tab_fav_url']}]
 
-    sessions_dict[session_title] = session_window_dict
+#     sessions_dict[session_title] = session_window_dict
 
 
-  if len(focused_windows_list) > 0:
-    return render_template(
-      'new_home.html', 
-      last_refreshed_timestamp=last_refreshed_timestamp,
-      focused_window_id=focused_window_tabs[0]['window_id'],
-      focused_tabs_list=focused_windows_list,
-      minimized_windows_dict=minimized_windows_dict,
-      active_windows_dict=active_windows_dict,
-      sessions=sessions_dict
-    )
-  else:
-    return render_template(
-      'new_home.html', 
-      last_refreshed_timestamp=last_refreshed_timestamp,
-      focused_window_id='',
-      focused_tabs_list=focused_windows_list,
-      minimized_windows_dict=minimized_windows_dict,
-      active_windows_dict=active_windows_dict,
-      sessions=sessions_dict
-    )
+#   if len(focused_windows_list) > 0:
+#     return render_template(
+#       'new_home.html', 
+#       last_refreshed_timestamp=last_refreshed_timestamp,
+#       focused_window_id=focused_window_tabs[0]['window_id'],
+#       focused_tabs_list=focused_windows_list,
+#       minimized_windows_dict=minimized_windows_dict,
+#       active_windows_dict=active_windows_dict,
+#       sessions=sessions_dict
+#     )
+#   else:
+#     return render_template(
+#       'new_home.html', 
+#       last_refreshed_timestamp=last_refreshed_timestamp,
+#       focused_window_id='',
+#       focused_tabs_list=focused_windows_list,
+#       minimized_windows_dict=minimized_windows_dict,
+#       active_windows_dict=active_windows_dict,
+#       sessions=sessions_dict
+#     )
+
+
 
 
 @app.route('/refresh_windows', methods=['POST'])
 def refresh_window():
   # print('json-data:', request.get_json())
+  
+  cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
   sql = 'delete from current_windows'
-  g.db.execute(sql)
+  cur.execute(sql)
   g.db.commit()
+
   data = request.get_json()
   for li in data:
     window_dict = li[-1]
@@ -223,8 +211,9 @@ def refresh_window():
       # window_id = di['windowId']
       tab_id = di['id']
 
-      sql = 'insert into current_windows (window_id, window_state, window_focused, tab_id, title, url, fav_url) values (?, ?, ?, ?, ?, ?, ?)'
-      g.db.execute(sql, (window_id, window_state, window_focused, tab_id, title, url, fav_url,))
+      # print(window_id, window_state, window_focused, tab_id, title, url, fav_url)
+      sql = 'insert into current_windows(window_id, window_state, window_focused, tab_id, title, url, fav_url) values (%s, %s, %s, %s, %s, %s, %s)'
+      cur.execute(sql, (window_id, window_state, window_focused, tab_id, title, url, fav_url))
       g.db.commit()
 
   return {'success': True}
@@ -324,7 +313,7 @@ def open_session(name):
 
 
 if __name__ == "__main__":
-  app.run()
+  app.run(debug=True)
 
 # export FLASK_APP=app.py
 # export FLASK_ENV=development

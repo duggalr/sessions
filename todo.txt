@@ -1,0 +1,4 @@
+use postgres
+finalize ui + functionality <-- fix all bugs + basic code-abstraction
+deploy to aws and use http url for now
+add favicon
