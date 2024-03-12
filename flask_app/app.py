@@ -65,13 +65,11 @@ def refresh_window():
 
     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
-    # TODO: create new schema and run below; show in UI and finalize the UI 
-
-    sql = 'delete from window'
+    sql = 'delete from browser_window'
     cur.execute(sql)
     g.db.commit()
 
-    sql = 'delete from tab'
+    sql = 'delete from browser_tab'
     cur.execute(sql)
     g.db.commit()
 
@@ -81,7 +79,7 @@ def refresh_window():
         tab_data_list = mdict['tab_info']
         num_tabs = mdict['num_of_tabs']
         
-        sql = """insert into window(
+        sql = """insert into browser_window(
             google_id, focused, state, number_of_tabs
         ) values (%s, %s, %s, %s) RETURNING id"""
         cur.execute(sql, (
@@ -95,14 +93,14 @@ def refresh_window():
         last_inserted_row_id = cur.fetchone()[0]
 
         for tb_dict in tab_data_list:
-            sql = """insert into tab(
+            sql = """insert into browser_tab(
                 google_id, title, url, favicon_url, is_active, window_object_id
-            ) values (%s, %s, %s, %s, %s)"""
+            ) values (%s, %s, %s, %s, %s, %s)"""
             cur.execute(sql, (
                 tb_dict['id'],
                 tb_dict['title'],
                 tb_dict['url'],
-                tb_dict['favIconUrl'],
+                tb_dict.get('favIconUrl', None),
                 tb_dict['active'],
                 last_inserted_row_id
             ))

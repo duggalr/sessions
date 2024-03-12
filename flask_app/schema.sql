@@ -21,7 +21,7 @@
 -- );
 
 
-create table window(
+create table browser_window(
   id serial primary key,
   google_id integer,
   focused boolean,
@@ -38,7 +38,7 @@ create table window(
   -- fetched_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
 )
 
-create table tab(
+create table browser_tab(
   id serial primary key,
   google_id integer,
   title text,
