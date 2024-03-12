@@ -38,24 +38,23 @@ def teardown_request(exception):
 def home():
     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
-    sql = 'select * from current_windows where window_focused=1'
+    sql = 'select * from browser_window where focused = true'
     cur.execute(sql)
-    focused_window_tabs = cur.fetchall()
-    focused_window_tab_list = []
-    last_refreshed_timestamp = ''
-    for rw in focused_window_tabs:
-        dt_timestamp = rw['created_at']
-        ct = datetime.datetime.now()
-        td = ct - dt_timestamp
-        td_mins = int(round(td.total_seconds() / 60))
-        last_refreshed_timestamp = td_mins
-        tab_dict = utils.create_tab_dict(rw)
-        focused_window_tab_list.append(tab_dict)
 
-    print(focused_window_tab_list)
+    active_window = cur.fetchone()  # assuming only one
+
+    sql = 'select * from browser_tab where window_object_id = %s'
+    cur.execute(sql, (active_window['id'],))
+    active_window_tabs = cur.fetchall()
+
+    rv = {
+        'active_window': active_window,
+        'active_window_tabs': active_window_tabs
+    }
 
     return render_template(
-    'new_home_one.html',
+        'new_home_one.html',
+        value = rv
     )
 
 
