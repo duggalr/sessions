@@ -39,6 +39,20 @@
                 cursor: pointer;
             }
 
+            #window_right_arrow_span{
+                font-size: 16px;
+            }
+
+            .window_left_arrow:hover{
+                cursor: pointer;
+                color: lightblue;
+            }
+
+            .window_right_arrow:hover{
+                cursor: pointer;
+                color: lightblue;
+            }
+
             /* .flex-container {
                 display: flex;
                 justify-content: center;
@@ -89,220 +103,71 @@
         <div class="four wide column"></div>
 
         <div class="eight wide column">
-            
-            <div>
-                <div class="ui header" style="font-size: 20px;">
-                    Window
-                    &nbsp;
 
-                    <div style="float: right;">
+            <div id="active_card_parent_div">
 
-                        <button class="ui small button" id="refresh_active_sessions" onclick="refreshSession()">Refresh</button>
-                        &nbsp;
-                        <div class="ui animated small black button" tabindex="0">
-                            <div class="visible content">next</div>
-                            <div class="hidden content">
-                              <i class="right arrow icon"></i>
+                {% for wdi in value['final_window_tab_list'] %}
+
+                    <div id="window_{{ wdi['window_object_id'] }}" style="display: none;">
+
+                        <div class="ui header" style="font-size: 20px;">
+                            {{ wdi['window_title'] }}
+                            &nbsp;
+    
+                            <span id="window_right_arrow_span">
+                                <i class="arrow left icon window_left_arrow"></i>
+                                <i class="arrow right icon window_right_arrow"></i>
+                                <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
+                            </span>
+    
+                            <div style="float: right;">
+                                <button class="ui small black button" id="refresh_active_sessions" onclick="refreshSession()">Refresh</button>
                             </div>
+    
                         </div>
-                    </div>
 
-                </div>
-
-            </div>
-
-            <div class="ui card" style="width: 100%; margin-top: 6.5%;">
+                        <div class="ui card" style="width: 100%; margin-top: 6.5%;">
                 
-                <div class="content">
-                    <h2 class="ui sub header" style="font-size: 16px;">
-                        Tabs
-                        <a class="ui blue label" style="float: right;">active window</a>
-                    </h2>
-                </div>
-
-                <div class="content">
-
-                    <!-- <h4 class="ui sub header">Active Window</h4> -->
-                    <div class="ui small feed" >
-
-                        {% for tdi in value['active_window_tabs'] %}
-
-                            <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
-                                <div class="content">
-                                    <div class="summary">
-                                        <!-- <i class="chrome icon"></i> -->
-                                        <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
-                                        <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
-                                            {{ tdi['title'] }}
-                                        </a>
-                                        <!-- <span style="color: gray; padding-left: 5px; font-size: 13px;">
-                                            ({{ tdi['url'] }})
-                                        </span> -->
-                                        <span class="trash_span" style="float: right; font-size: 15px; color: red;">
-                                            <i class="trash alternate outline icon"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="border-bottom: 0.5px solid lightgrey;"></div>
-
-                        {% endfor %}
-
-                        <!-- <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
                             <div class="content">
-                                <div class="summary">
-                                    <i class="chrome icon"></i>
-                                    <a href="" style="font-size: 15px;">
-                                        Semantic UI
-                                    </a>
-                                    <span style="color: gray; padding-left: 5px; font-size: 13px;">
-                                        (https://semantic-ui.com/elements/icon.html)
-                                    </span>
-                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;">
-                                        <i class="trash alternate outline icon"></i>
-                                    </span>
-                                </div>
+                                <h2 class="ui sub header" style="font-size: 16px;">
+                                    Tabs
+                                    <a class="ui blue label" style="float: right;">active window</a>
+                                </h2>
                             </div>
+            
+                            <div class="content">
+            
+                                <div class="ui small feed" >
+
+                                    {% for tdi in wdi['tabs'] %}
+            
+                                        <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
+                                            <div class="content">
+                                                <div class="summary">
+                                                    <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
+                                                    <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                                        {{ tdi['title'] }}
+                                                    </a>                                    
+                                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;">
+                                                        <i class="trash alternate outline icon"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+            
+                                        <div style="border-bottom: 0.5px solid lightgrey;"></div>
+            
+                                    {% endfor %}
+            
+                                </div>
+            
+                            </div>
+            
                         </div>
-
-                        <div style="border-bottom: 0.5px solid lightgrey;"></div>
-
-                        <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
-                            <div class="content">
-                                <div class="summary">
-                                    <i class="chrome icon"></i>
-                                    <a href="" style="font-size: 15px;">
-                                        Semantic UI
-                                    </a>
-                                    <span style="color: gray; padding-left: 5px; font-size: 13px;">
-                                        (https://semantic-ui.com/elements/icon.html)
-                                    </span>
-                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;">
-                                        <i class="trash alternate outline icon"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="border-bottom: 0.5px solid lightgrey;"></div>
-
-                        <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
-                            <div class="content">
-                                <div class="summary">
-                                    <i class="chrome icon"></i>
-                                    <a href="" style="font-size: 15px;">
-                                        Semantic UI
-                                    </a>
-                                    <span style="color: gray; padding-left: 5px; font-size: 13px;">
-                                        (https://semantic-ui.com/elements/icon.html)
-                                    </span>
-                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;">
-                                        <i class="trash alternate outline icon"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div> -->
 
                     </div>
 
-
-                    <!-- <div class="ui relaxed divided list">
-
-                        <div class="item">
-                          <i class="large github middle aligned icon"></i>
-                          <div class="content">
-                            <a class="header">Semantic-Org/Semantic-UI</a>
-                            <div class="description">Updated 10 mins ago</div>
-                          </div>
-                        </div>
-
-                        <div class="item">
-                          <i class="large github middle aligned icon"></i>
-                          <div class="content">
-                            <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                            <div class="description">Updated 22 mins ago</div>
-                          </div>
-                        </div>
-
-                        <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-                          <div class="item">
-                            <i class="large github middle aligned icon"></i>
-                            <div class="content">
-                              <a class="header">Semantic-Org/Semantic-UI-Docs</a>
-                              <div class="description">Updated 22 mins ago</div>
-                            </div>
-                          </div>
-
-                    </div> -->
-
-                </div>
+                {% endfor %}
 
             </div>
 
@@ -315,12 +180,139 @@
 
     <script>
 
-        function refreshSession(){
+        // $('.shape').shape();
 
-            var data = { type: "refresh_session" };
-            window.postMessage(data, "*");
+        // $('#window_right_arrow').click(function(){
+
+        //     $('.shape').shape('flip right');
+
+        // });
+
+        // function refreshSession(){
+
+        //     var data = { type: "refresh_session" };
+        //     window.postMessage(data, "*");
+
+        // }
+
+
+        // TODO:
+            // get all the windows to show
+            // finalize UI for active windows along with functionality (refresh + tab delete + window opening)
+            // go from there...
+
+        let final_window_id_list = {{ value['final_window_id_list']|safe }};
+
+        console.log('final_window_id_list', final_window_id_list)
+
+        let current_window_id;
+        let url = new URL(location.href);
+        let c = url.searchParams.get("c");
+
+        if (c == null){
+
+            c = 0;
+            current_window_id = final_window_id_list[c];
+
+            $('.window_left_arrow').hide();
+
+        } else {
+
+            if (c <= final_window_id_list.length-1 && c > 0){
+
+                current_window_id = final_window_id_list[c];
+                $('.window_left_arrow').show();
+
+            } else {
+                // const params = new URLSearchParams(url.search);
+                // params.delete("c");
+
+                current_window_id = final_window_id_list[0];
+                window.history.replaceState(null, '', window.location.pathname);
+                $('.window_left_arrow').hide();
+            }
 
         }
+        
+        $('#' + current_window_id).show();
+        // console.log('current_window_id', current_window_id)
+
+        $('.window_right_arrow').click(function(){
+
+            console.log('current_window_id-old', current_window_id, c)
+
+            let possible_new_id = c + 1;
+
+            if (possible_new_id > 0 && possible_new_id <= final_window_id_list.length-1){
+                
+                c = c + 1;
+                current_window_id = final_window_id_list[c];
+                $('.window_left_arrow').show();
+
+            } else {
+
+                c = 0;
+                current_window_id = final_window_id_list[c];
+                $('.window_left_arrow').hide();
+
+            }
+
+            if (c == final_window_id_list.length-1){
+
+                $('.window_right_arrow').hide();
+
+            } else {
+                $('.window_right_arrow').show();
+            }
+
+            console.log('current_window_id', current_window_id, c)
+            // $('#' + current_window_id).show();
+
+            for (i = 0; i < final_window_id_list.length; i++){
+
+                $('#' + final_window_id_list[i]).hide();
+
+            }
+
+            $('#' + current_window_id).show();
+
+        });
+
+
+        $('.window_left_arrow').click(function(){
+
+            console.log('current_window_id-old', current_window_id, c)
+
+            let possible_new_id = c - 1;
+
+            if (possible_new_id > 0 && possible_new_id <= final_window_id_list.length-1){
+                
+                c = c - 1;
+                current_window_id = final_window_id_list[c];
+                $('.window_left_arrow').show();
+                $('.window_right_arrow').show();
+
+            } else {
+
+                c = 0;
+                current_window_id = final_window_id_list[c];
+                $('.window_left_arrow').hide();
+                $('.window_right_arrow').show();
+
+            }
+
+            console.log('current_window_id', current_window_id, c)
+            // $('#' + current_window_id).show();
+
+            for (i = 0; i < final_window_id_list.length; i++){
+
+                $('#' + final_window_id_list[i]).hide();
+
+            }
+
+            $('#' + current_window_id).show();
+
+        });
 
     </script>
 

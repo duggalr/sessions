@@ -1,5 +1,6 @@
 import os
 import datetime
+import json
 import psycopg2
 import psycopg2.extras
 import flask
@@ -38,24 +39,70 @@ def teardown_request(exception):
 def home():
     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
-    sql = 'select * from browser_window where focused = true'
+    sql = 'select * from browser_window order by focused desc'
     cur.execute(sql)
+    all_windows = cur.fetchall()
 
-    active_window = cur.fetchone()  # assuming only one
-
-    sql = 'select * from browser_tab where window_object_id = %s'
-    cur.execute(sql, (active_window['id'],))
-    active_window_tabs = cur.fetchall()
+    final_window_tab_list = []
+    final_window_id_list = []
+    c = 1
+    for wdi in all_windows:
+        sql = 'select * from browser_tab where window_object_id = %s'
+        cur.execute(sql, (wdi['id'],))
+        c_wd_tabs = cur.fetchall()
+        final_window_tab_list.append({
+            'window_object_id': wdi['id'],
+            'current_count': c,
+            'window_title': f'Window {c}',
+            'window': wdi,
+            'tabs': c_wd_tabs
+        })
+        final_window_id_list.append(f"window_{ wdi['id'] }")
+        c += 1
 
     rv = {
-        'active_window': active_window,
-        'active_window_tabs': active_window_tabs
+        'final_window_id_list': json.dumps(final_window_id_list),
+        'final_window_tab_list': final_window_tab_list
     }
 
     return render_template(
         'new_home_one.html',
         value = rv
     )
+
+    # sql = 'select * from browser_window where focused = true'
+    # cur.execute(sql)
+
+    # active_window = cur.fetchone()  # assuming only one
+
+    # sql = 'select * from browser_tab where window_object_id = %s'
+    # cur.execute(sql, (active_window['id'],))
+    # active_window_tabs = cur.fetchall()
+
+    # sql = 'select * from browser_window where focused = false'
+    # cur.execute(sql)    
+    # non_active_windows = cur.fetchall()
+
+    # non_active_window_tab_list = []
+    # for n_act_wd in non_active_windows:
+    #     sql = 'select * from browser_tab where window_object_id = %s'
+    #     cur.execute(sql, (n_act_wd['id'],))
+    #     c_wd_tabs = cur.fetchall()
+    #     non_active_window_tab_list.append({
+    #         'window_dict': n_act_wd,
+    #         'tabs': c_wd_tabs
+    #     })
+
+    # rv = {
+    #     'active_window': active_window,
+    #     'active_window_tabs': active_window_tabs,
+    #     'non_active_windows': non_active_window_tab_list
+    # }
+
+    # return render_template(
+    #     'new_home_one.html',
+    #     value = rv
+    # )
 
 
 @app.route('/refresh_windows', methods=['POST'])
