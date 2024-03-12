@@ -84,7 +84,7 @@
     </div>
 
 
-    <div class="ui grid container" style="margin-top: 5%;">
+    <div class="ui grid container" style="margin-top: 2%;">
 
         <div class="four wide column"></div>
 
@@ -113,11 +113,9 @@
 
             <div class="ui card" style="width: 100%; margin-top: 6.5%;">
                 
-                <!-- TODO: proceed here to implementation -->
                 <div class="content">
                     <h2 class="ui sub header" style="font-size: 16px;">
-                        <!-- Tabs -->
-                        {{ value['active_window'] }}
+                        Tabs
                         <a class="ui blue label" style="float: right;">active window</a>
                     </h2>
                 </div>
@@ -127,7 +125,31 @@
                     <!-- <h4 class="ui sub header">Active Window</h4> -->
                     <div class="ui small feed" >
 
-                        <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
+                        {% for tdi in value['active_window_tabs'] %}
+
+                            <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
+                                <div class="content">
+                                    <div class="summary">
+                                        <!-- <i class="chrome icon"></i> -->
+                                        <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
+                                        <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                            {{ tdi['title'] }}
+                                        </a>
+                                        <!-- <span style="color: gray; padding-left: 5px; font-size: 13px;">
+                                            ({{ tdi['url'] }})
+                                        </span> -->
+                                        <span class="trash_span" style="float: right; font-size: 15px; color: red;">
+                                            <i class="trash alternate outline icon"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="border-bottom: 0.5px solid lightgrey;"></div>
+
+                        {% endfor %}
+
+                        <!-- <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
                             <div class="content">
                                 <div class="summary">
                                     <i class="chrome icon"></i>
@@ -180,7 +202,7 @@
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
 
