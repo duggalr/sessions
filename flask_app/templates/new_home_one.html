@@ -116,6 +116,7 @@
     
                             <span id="window_right_arrow_span">
                                 <i class="arrow left icon window_left_arrow"></i>
+                                &nbsp;
                                 <i class="arrow right icon window_right_arrow"></i>
                                 <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
                             </span>
@@ -130,7 +131,7 @@
                 
                             <div class="content">
                                 <h2 class="ui sub header" style="font-size: 16px;">
-                                    Tabs
+                                    Tabs ({{ wdi['tabs']|length }})
                                     <a class="ui blue label" style="float: right;">active window</a>
                                 </h2>
                             </div>
