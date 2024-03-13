@@ -111,11 +111,11 @@ def refresh_window():
 
     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
-    sql = 'delete from browser_window'
+    sql = 'delete from browser_tab'
     cur.execute(sql)
     g.db.commit()
 
-    sql = 'delete from browser_tab'
+    sql = 'delete from browser_window'
     cur.execute(sql)
     g.db.commit()
 

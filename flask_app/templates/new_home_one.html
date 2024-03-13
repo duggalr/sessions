@@ -98,11 +98,11 @@
     </div>
 
 
-    <div class="ui grid container" style="margin-top: 2%;">
+    <div class="ui grid container" style="margin-top: 0%;">
 
-        <div class="four wide column"></div>
+        <div class="three wide column"></div>
 
-        <div class="eight wide column">
+        <div class="ten wide column">
 
             <div id="active_card_parent_div">
 
@@ -116,13 +116,15 @@
     
                             <span id="window_right_arrow_span">
                                 <i class="arrow left icon window_left_arrow"></i>
-                                &nbsp;
+                                <!-- &nbsp; -->
                                 <i class="arrow right icon window_right_arrow"></i>
                                 <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
                             </span>
+                            &nbsp;&nbsp;
+                            <button class="ui tiny button" id="refresh_active_sessions">Open Window</button>
     
                             <div style="float: right;">
-                                <button class="ui small black button" id="refresh_active_sessions" onclick="refreshSession()">Refresh</button>
+                                <button class="ui medium black button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Tabs</button>
                             </div>
     
                         </div>
@@ -131,8 +133,12 @@
                 
                             <div class="content">
                                 <h2 class="ui sub header" style="font-size: 16px;">
-                                    Tabs ({{ wdi['tabs']|length }})
-                                    <a class="ui blue label" style="float: right;">active window</a>
+                                    Tabs ({{ wdi['tabs']|length }})                                    
+                                    {% if wdi['window']['focused'] %}
+                                        <a class="ui blue label" style="float: right;">active</a>
+                                    {% else %}
+                                        <a class="ui blue label" style="float: right;">{{ wdi['window']['state'] }}</a>
+                                    {% endif %}
                                 </h2>
                             </div>
             
@@ -148,8 +154,8 @@
                                                     <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
                                                     <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
                                                         {{ tdi['title'] }}
-                                                    </a>                                    
-                                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;">
+                                                    </a>
+                                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;" id="{{ tdi['google_id'] }}" onclick="deleteTab(this.id)">
                                                         <i class="trash alternate outline icon"></i>
                                                     </span>
                                                 </div>
@@ -174,7 +180,7 @@
 
         </div>
 
-        <div class="four wide column"></div>
+        <div class="three wide column"></div>
 
     </div>
 
@@ -188,14 +194,6 @@
         //     $('.shape').shape('flip right');
 
         // });
-
-        // function refreshSession(){
-
-        //     var data = { type: "refresh_session" };
-        //     window.postMessage(data, "*");
-
-        // }
-
 
         // TODO:
             // get all the windows to show
@@ -314,6 +312,34 @@
             $('#' + current_window_id).show();
 
         });
+
+
+
+        // Google Extension Messages
+        function refreshSession(){
+
+            var data = { type: "refresh_session" };
+            window.postMessage(data, "*");
+
+        };
+
+
+        function deleteTab(tab_id){
+            
+            // TODO:
+                // run refresh on tab delete
+                // get all this done for tab view and start crud**
+
+            console.log('tab-delete:', tab_id)
+            var data = { type: "remove_tab", tabID: tab_id };
+            window.postMessage(data, "*");
+
+            // TODO: why is it not updating the new tabs? 
+            // setTimeout(refreshSession(), 6000);
+
+        }
+
+
 
     </script>
 

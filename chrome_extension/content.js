@@ -11,15 +11,7 @@ window.addEventListener("message", function(event) {
       console.log('removing tab-id:', tab_id)
 
       chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {  
-
         // console.log('bckjs-res:', response)
-        // TODO: 
-          // open session 
-
-          // usage <-- see any other features would be useful <-- want this to feel like tmux
-            // potentially desktop as we continue using it
-          // after: 
-            // start the BM-explorations 
       });
 
     }

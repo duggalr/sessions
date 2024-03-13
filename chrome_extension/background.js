@@ -84,12 +84,12 @@ function tmpOne(){
                     url = REFRESH_WINDOW_API_URL, 
                     data = tmp_two_res
                 )
-                // response.then(function(res){
-                //     console.log('window-refresh-response:', res)
-                //     // chrome.tabs.update({  // redirect to flask-app once complete
-                //     //     url: 'http://127.0.0.1:5000'
-                //     // });
-                // });
+                response.then(function(res){
+                    console.log('window-refresh-response:', res)
+                    chrome.tabs.update({  // redirect to flask-app once complete
+                        url: 'http://127.0.0.1:5000'
+                    });
+                });
 
             });
 
@@ -179,4 +179,28 @@ chrome.action.onClicked.addListener(function(res){
     console.log('extension-clicked:', res)
     sendAllWindows()
 
-})
+});
+
+
+chrome.runtime.onMessage.addListener(
+    
+    function(request, sender, sendResponse) {
+        console.log('message:', request, sender)
+
+        if (request['type'] == 'refresh_session'){
+
+            sendAllWindows();
+
+        } else if (request['type'] == 'remove_tab'){
+            
+            chrome.tabs.remove(parseInt(request['data']['tab_id']), function(){
+                sendAllWindows();
+                // sendResponse({success: true});
+            })
+
+        }
+
+    }
+
+);
+  
