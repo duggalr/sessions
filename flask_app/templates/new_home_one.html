@@ -198,10 +198,6 @@
         <div class="header">Create new session</div>
         <div class="content">
         
-            <!-- <div class="ui input">
-                <label>Session Name</label>
-                <input type="text" placeholder="name your session...">
-            </div> -->
             <form class="ui form">
                 <div class="field" style="width: 40%;">
                     <label>Session Name</label>
@@ -209,204 +205,40 @@
                 </div>
             </form>
 
-            <h4>
-                Window 1
-                &nbsp;
-                <span>
-                    <div class="ui slider checkbox">
-                        <input type="checkbox" name="newsletter">
-                        <label>Select All</label>
-                    </div>
-                </span>
-            </h4>
-            
-            <div class="ui list">
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-            </div>
+            {% for wdi in value['final_window_tab_list'] %}
 
-            <h4>
-                Window 2
-                &nbsp;
-                <span>
-                    <div class="ui slider checkbox">
-                        <input type="checkbox" name="newsletter">
-                        <label>Select All</label>
-                    </div>
-                </span>
-            </h4>
-            <div class="ui list">
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-            </div>
+                <div class="primary_window_form_div">
 
-            <h4>
-                Window 3
-                &nbsp;
-                <span>
-                    <div class="ui slider checkbox">
-                        <input type="checkbox" name="newsletter">
-                        <label>Select All</label>
+                    <h4>
+                        {{ wdi['window_title'] }}
+                        &nbsp;
+                        <span>
+                            <div class="ui slider checkbox">
+                                <input type="checkbox" class="window_toggle">
+                                <label>Select All</label>
+                            </div>
+                        </span>
+                    </h4>
+    
+                    <div class="ui list">
+                    {% for tdi in wdi['tabs'] %}
+    
+                        <div class="ui checkbox item">
+                            <input type="checkbox" name="tab_url">
+                            <label>
+                                <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                    {{ tdi['title'] }}
+                                </a>
+                            </label>
+                        </div>
+    
+                    {% endfor %}
                     </div>
-                </span>
-            </h4>
-            <div class="ui list">
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-            </div>
 
-            <h4>
-                Window 3
-                &nbsp;
-                <span>
-                    <div class="ui slider checkbox">
-                        <input type="checkbox" name="newsletter">
-                        <label>Select All</label>
-                    </div>
-                </span>
-            </h4>
-            <div class="ui list">
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
                 </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-            </div>
 
-            <h4>
-                Window 3
-                &nbsp;
-                <span>
-                    <div class="ui slider checkbox">
-                        <input type="checkbox" name="newsletter">
-                        <label>Select All</label>
-                    </div>
-                </span>
-            </h4>
-            <div class="ui list">
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-            </div>
 
-            <h4>
-                Window 3
-                &nbsp;
-                <span>
-                    <div class="ui slider checkbox">
-                        <input type="checkbox" name="newsletter">
-                        <label>Select All</label>
-                    </div>
-                </span>
-            </h4>
-            <div class="ui list">
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-                <div class="ui checkbox item">
-                    <input type="checkbox" name="example">
-                    <label>Make my profile visible</label>
-                </div>
-            </div>
+            {% endfor %}
 
         </div>
         <div class="actions">
@@ -602,6 +434,35 @@
 
         });
 
+
+        $('.window_toggle').click(function(){
+
+            
+            // primary_window_form_div
+            // window_toggle
+
+            // TODO: 
+                // implement select all and go from there to finish up the modal form and start CRUD on sessions (ui + functionality)
+
+            let parent_div = $(this).parent().parent().parent().parent();
+            console.log(parent_div.find(':checkbox[name=tab_url]:checked'))
+
+            let allCheckBoxes = parent_div.find(':checkbox')
+            allCheckBoxes.prop("checked", !allCheckBoxes.prop("checked"));
+            // parent_div.find(':checkbox').click();
+
+            // parent_div.find(':checkbox').each(function(){
+
+            //     // $(this).attr('checked', $('#' + id).is(':checked'));
+            //     $(':checkbox').prop("checked", true);
+
+            // });
+
+            // $(':checkbox[name=selectAll]').click (function () {
+            //     $(':checkbox[name=domainList]').prop('checked', this.checked);
+            // });
+            
+        });
 
     </script>
 
