@@ -53,6 +53,10 @@
                 color: lightblue;
             }
 
+            #active_card_parent_div{
+                margin-top: 2%;
+            }
+
             /* .flex-container {
                 display: flex;
                 justify-content: center;
@@ -122,11 +126,15 @@
                             </span>
                             <!-- &nbsp;&nbsp;
                             <button class="ui tiny button" id="refresh_active_sessions">Open Window</button> -->
-    
-                            <button class="ui tiny button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)">Close Window</button>
+                            
+                            <!-- &nbsp; -->
 
                             <div style="float: right;">
+                                <button class="ui medium button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)">Close Window</button>
+                                &nbsp;
                                 <button class="ui medium black button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Tabs</button>
+                                &nbsp;
+                                <button class="ui medium black button" id="create_session_button">Create New Session</button>
                             </div>
     
                         </div>
@@ -184,6 +192,227 @@
 
         <div class="three wide column"></div>
 
+    </div>
+
+    <div class="ui small modal create_session_modal">
+        <div class="header">Create new session</div>
+        <div class="content">
+        
+            <!-- <div class="ui input">
+                <label>Session Name</label>
+                <input type="text" placeholder="name your session...">
+            </div> -->
+            <form class="ui form">
+                <div class="field" style="width: 40%;">
+                    <label>Session Name</label>
+                    <input type="text" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
+                </div>
+            </form>
+
+            <h4>
+                Window 1
+                &nbsp;
+                <span>
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="newsletter">
+                        <label>Select All</label>
+                    </div>
+                </span>
+            </h4>
+            
+            <div class="ui list">
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+            </div>
+
+            <h4>
+                Window 2
+                &nbsp;
+                <span>
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="newsletter">
+                        <label>Select All</label>
+                    </div>
+                </span>
+            </h4>
+            <div class="ui list">
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+            </div>
+
+            <h4>
+                Window 3
+                &nbsp;
+                <span>
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="newsletter">
+                        <label>Select All</label>
+                    </div>
+                </span>
+            </h4>
+            <div class="ui list">
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+            </div>
+
+            <h4>
+                Window 3
+                &nbsp;
+                <span>
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="newsletter">
+                        <label>Select All</label>
+                    </div>
+                </span>
+            </h4>
+            <div class="ui list">
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+            </div>
+
+            <h4>
+                Window 3
+                &nbsp;
+                <span>
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="newsletter">
+                        <label>Select All</label>
+                    </div>
+                </span>
+            </h4>
+            <div class="ui list">
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+            </div>
+
+            <h4>
+                Window 3
+                &nbsp;
+                <span>
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="newsletter">
+                        <label>Select All</label>
+                    </div>
+                </span>
+            </h4>
+            <div class="ui list">
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+                <div class="ui checkbox item">
+                    <input type="checkbox" name="example">
+                    <label>Make my profile visible</label>
+                </div>
+            </div>
+
+        </div>
+        <div class="actions">
+            <div class="ui black approve button">Submit</div>
+            <div class="ui cancel button">Cancel</div>
+        </div>
     </div>
 
 
@@ -365,6 +594,13 @@
             //     window.postMessage(data, "*");
             // }
         // }
+
+
+        $('#create_session_button').click(function(){
+
+            $('.create_session_modal').modal('show');
+
+        });
 
 
     </script>

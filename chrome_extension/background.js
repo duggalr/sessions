@@ -196,7 +196,7 @@ chrome.runtime.onMessage.addListener(
         else if (request['type'] == 'remove_tab'){
             
             chrome.tabs.remove(parseInt(request['data']['tab_id']), function(){
-                // sendAllWindows();
+                sendAllWindows();
                 // sendResponse({success: true});
             })
 
