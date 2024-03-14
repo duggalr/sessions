@@ -442,25 +442,12 @@
             // window_toggle
 
             // TODO: 
-                // implement select all and go from there to finish up the modal form and start CRUD on sessions (ui + functionality)
+                // finish up the modal form and start CRUD on sessions (ui + functionality)
 
             let parent_div = $(this).parent().parent().parent().parent();
             console.log(parent_div.find(':checkbox[name=tab_url]:checked'))
-
-            let allCheckBoxes = parent_div.find(':checkbox')
-            allCheckBoxes.prop("checked", !allCheckBoxes.prop("checked"));
-            // parent_div.find(':checkbox').click();
-
-            // parent_div.find(':checkbox').each(function(){
-
-            //     // $(this).attr('checked', $('#' + id).is(':checked'));
-            //     $(':checkbox').prop("checked", true);
-
-            // });
-
-            // $(':checkbox[name=selectAll]').click (function () {
-            //     $(':checkbox[name=domainList]').prop('checked', this.checked);
-            // });
+            
+            parent_div.find(':checkbox').prop("checked", $(this).prop('checked'))
             
         });
 
