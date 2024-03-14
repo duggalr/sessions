@@ -120,9 +120,11 @@
                                 <i class="arrow right icon window_right_arrow"></i>
                                 <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
                             </span>
-                            &nbsp;&nbsp;
-                            <button class="ui tiny button" id="refresh_active_sessions">Open Window</button>
+                            <!-- &nbsp;&nbsp;
+                            <button class="ui tiny button" id="refresh_active_sessions">Open Window</button> -->
     
+                            <button class="ui tiny button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)">Close Window</button>
+
                             <div style="float: right;">
                                 <button class="ui medium black button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Tabs</button>
                             </div>
@@ -326,19 +328,43 @@
 
         function deleteTab(tab_id){
             
-            // TODO:
-                // run refresh on tab delete
-                // get all this done for tab view and start crud**
-
             console.log('tab-delete:', tab_id)
             var data = { type: "remove_tab", tabID: tab_id };
             window.postMessage(data, "*");
 
-            // TODO: why is it not updating the new tabs? 
-            // setTimeout(refreshSession(), 6000);
+        }
+
+        function removeWindow(window_id){
+
+            console.log('window-delete:', window_id)
+            var data = { type: "remove_window", window_id: window_id };
+            window.postMessage(data, "*");
 
         }
 
+        // function openWindow(window_id){
+
+        //     // TODO:
+        //         // pass the current window_id and all it's associated tabs
+        //         // if window_id still exists, bring to focus
+        //         // else, open all tabs in new window
+
+        //     console.log('open-window:', window_id)
+        //     var data = { type: "open_window", windowID: window_id };
+        //     window.postMessage(data, "*");
+
+        // }
+
+        // function openSession(elem){
+
+            // // var session_name = $(elem).parent().parent().find('h3')[0].innerHTML.trim()
+            // // console.log('name:', session_name, sessions_dict['asdkadj'])
+            // // var session_val = sessions_dict[session_name]
+            // if (session_val != undefined){
+            //     var data = { type: "open_session", data: session_val };
+            //     window.postMessage(data, "*");
+            // }
+        // }
 
 
     </script>

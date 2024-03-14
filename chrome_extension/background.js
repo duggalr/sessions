@@ -191,16 +191,39 @@ chrome.runtime.onMessage.addListener(
 
             sendAllWindows();
 
-        } else if (request['type'] == 'remove_tab'){
+        }
+        
+        else if (request['type'] == 'remove_tab'){
             
             chrome.tabs.remove(parseInt(request['data']['tab_id']), function(){
-                sendAllWindows();
+                // sendAllWindows();
                 // sendResponse({success: true});
             })
+
+        }
+        // else if (request['type'] == 'open_window'){
+            
+        //     chrome.windows.update(windowId, { focused: true }, function(updatedWindow) {
+        //         console.log("Window with ID " + windowId + " is now focused.");
+        //     });
+
+        // }
+        
+        else if (request['type'] == 'remove_window'){
+
+            console.log('request-message:', request)
+
+            chrome.windows.remove(parseInt(request['data']['window_id']), function() {
+                
+                setTimeout(function() { sendAllWindows() }, 100);
+                
+                // sendResponse({success: true});
+                // console.log("Window with ID " + windowId + " has been closed.");
+            });
 
         }
 
     }
 
 );
-  
+
