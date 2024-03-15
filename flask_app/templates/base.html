@@ -10,12 +10,18 @@
 
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}" />
         <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" />
 
     </head>
 
     <body>
 
         {% include 'top_navbar.html' %}
+
+        {% block content %}
+
+
+        {% endblock %}
         
     </body>
 
