@@ -50,8 +50,18 @@ create table browser_tab(
   FOREIGN KEY (window_object_id) REFERENCES window(id)
 )
 
+create table saved_session(
+  id serial primary key,
+  session_name text,
+  created_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+)
 
--- create table saved_windows(
--- -- user saved created windows
--- )
+create table saved_session_url(
+  id serial primary key,
+  title text,
+  url text,
+  favicon_url text,
+  session_object_id integer not null,
+  FOREIGN KEY (session_object_id) REFERENCES saved_sessions(id)
+)
 

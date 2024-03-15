@@ -67,6 +67,7 @@
 
     </head>
 
+
 <body>
 
     <div class="ui secondary menu top-menu">
@@ -100,7 +101,6 @@
 
     </div>
 
-
     <div class="ui grid container" style="margin-top: 0%;">
 
         <div class="three wide column"></div>
@@ -109,31 +109,27 @@
 
             <div id="active_card_parent_div">
 
-                {% for wdi in value['final_window_tab_list'] %}
+                {% for session_dict in value['final_sessions_list'] %}
 
-                    <div id="window_{{ wdi['window_object_id'] }}" style="display: none;">
+                    <div id="session_{{ session_dict['session_object_id'] }}" style="display: none;">
 
                         <div class="ui header" style="font-size: 20px;">
-                            {{ wdi['window_title'] }}
+                            {{ session_dict['session']['session_name'] }}
                             &nbsp;
     
                             <span id="window_right_arrow_span">
                                 <i class="arrow left icon window_left_arrow"></i>
                                 <!-- &nbsp; -->
                                 <i class="arrow right icon window_right_arrow"></i>
-                                <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
+                                <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span>
                             </span>
-                            <!-- &nbsp;&nbsp;
-                            <button class="ui tiny button" id="refresh_active_sessions">Open Window</button> -->
                             
-                            <!-- &nbsp; -->
-
                             <div style="float: right;">
-                                <button class="ui medium button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)">Close Window</button>
+                                <button class="ui medium black button" id="open_session" onclick="">Open</button>
                                 &nbsp;
-                                <button class="ui medium black button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Tabs</button>
+                                <button class="ui medium button" onclick="">Update</button>
                                 &nbsp;
-                                <button class="ui medium black button" id="create_session_button">Create New Session</button>
+                                <button class="ui medium button" onclick="">Delete</button>
                             </div>
     
                         </div>
@@ -142,12 +138,7 @@
                 
                             <div class="content">
                                 <h2 class="ui sub header" style="font-size: 16px;">
-                                    Tabs ({{ wdi['tabs']|length }})                                    
-                                    {% if wdi['window']['focused'] %}
-                                        <a class="ui blue label" style="float: right;">active</a>
-                                    {% else %}
-                                        <a class="ui blue label" style="float: right;">{{ wdi['window']['state'] }}</a>
-                                    {% endif %}
+                                    Tabs ({{ session_dict['tabs']|length }})
                                 </h2>
                             </div>
             
@@ -155,7 +146,7 @@
             
                                 <div class="ui small feed" >
 
-                                    {% for tdi in wdi['tabs'] %}
+                                    {% for tdi in session_dict['tabs'] %}
             
                                         <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
                                             <div class="content">
@@ -164,9 +155,6 @@
                                                     <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
                                                         {{ tdi['title'] }}
                                                     </a>
-                                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;" id="{{ tdi['google_id'] }}" onclick="deleteTab(this.id)">
-                                                        <i class="trash alternate outline icon"></i>
-                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -193,79 +181,12 @@
 
     </div>
 
-    <div class="ui small modal create_session_modal">
-        <div class="header">Create new session</div>
-        <div class="content">
-        
-            <!-- <form class="ui form" > -->
-            <div class="field" style="width: 40%;">
-                <label>Session Name</label>
-                <input type="text" id="session_name" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
-            </div>
-
-            <br/>
-            {% for wdi in value['final_window_tab_list'] %}
-
-                <div class="primary_window_form_div">
-
-                    <h4>
-                        {{ wdi['window_title'] }}
-                        &nbsp;
-                        <span>
-                            <div class="ui slider checkbox">
-                                <input type="checkbox" class="window_toggle">
-                                <label>Select All</label>
-                            </div>
-                        </span>
-                    </h4>
-    
-                    <div class="ui list">
-                    {% for tdi in wdi['tabs'] %}
-    
-                        <div class="ui checkbox item">
-                            <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
-                            <label>
-                                <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
-                                    {{ tdi['title'] }}
-                                </a>
-                            </label>
-                        </div>
-    
-                    {% endfor %}
-                    </div>
-
-                </div>
-                <br/>
-
-            {% endfor %}
-            <!-- </form> -->
-
-        </div>
-        <div class="actions">
-            <div id="create_session_form_button" class="ui black approve button">Submit</div>
-            <div class="ui cancel button">Cancel</div>
-        </div>
-    </div>
-
 
     <script>
 
-        // $('.shape').shape();
+        let final_window_id_list = {{ value['final_sessions_id_list']|safe }};
 
-        // $('#window_right_arrow').click(function(){
-
-        //     $('.shape').shape('flip right');
-
-        // });
-
-        // TODO:
-            // get all the windows to show
-            // finalize UI for active windows along with functionality (refresh + tab delete + window opening)
-            // go from there...
-
-        let final_window_id_list = {{ value['final_window_id_list']|safe }};
-
-        let final_window_tab_list = {{ value['final_window_tab_list']|tojson }};
+        let final_window_tab_list = {{ value['final_sessions_list']|tojson }};
 
         console.log('final_window_tab_list:', final_window_tab_list)
 
@@ -279,12 +200,9 @@
                 let tb_url = w_tb_dict[3];
                 let tb_title = w_tb_dict[2];
                 let tb_favicon_url = w_tb_dict[4];
-                tab_dict[tb_url] = {'url': tb_url, 'title': tb_title, 'favicon_url': tb_favicon_url}
+                tab_dict[tb_url] = {'url': tb_url, 'title': tb_title, 'favicon_url': tb_favicon_url};
             }
-        }
-
-        console.log('final_window_id_list', final_window_id_list)
-        console.log('tab-dict', tab_dict)
+        };
 
         let current_window_id;
         let url = new URL(location.href);
@@ -305,16 +223,14 @@
                 $('.window_left_arrow').show();
 
             } else {
-                // const params = new URLSearchParams(url.search);
-                // params.delete("c");
 
                 current_window_id = final_window_id_list[0];
                 window.history.replaceState(null, '', window.location.pathname);
                 $('.window_left_arrow').hide();
             }
 
-        }
-        
+        };
+
         $('#' + current_window_id).show();
         // console.log('current_window_id', current_window_id)
 
@@ -396,111 +312,7 @@
         });
 
 
-
-        // Google Extension Messages
-        function refreshSession(){
-
-            var data = { type: "refresh_session" };
-            window.postMessage(data, "*");
-
-        };
-
-
-        function deleteTab(tab_id){
-            
-            console.log('tab-delete:', tab_id)
-            var data = { type: "remove_tab", tabID: tab_id };
-            window.postMessage(data, "*");
-
-        }
-
-        function removeWindow(window_id){
-
-            console.log('window-delete:', window_id)
-            var data = { type: "remove_window", window_id: window_id };
-            window.postMessage(data, "*");
-
-        }
-
-        // function openWindow(window_id){
-
-        //     // TODO:
-        //         // pass the current window_id and all it's associated tabs
-        //         // if window_id still exists, bring to focus
-        //         // else, open all tabs in new window
-
-        //     console.log('open-window:', window_id)
-        //     var data = { type: "open_window", windowID: window_id };
-        //     window.postMessage(data, "*");
-
-        // }
-
-        // function openSession(elem){
-
-            // // var session_name = $(elem).parent().parent().find('h3')[0].innerHTML.trim()
-            // // console.log('name:', session_name, sessions_dict['asdkadj'])
-            // // var session_val = sessions_dict[session_name]
-            // if (session_val != undefined){
-            //     var data = { type: "open_session", data: session_val };
-            //     window.postMessage(data, "*");
-            // }
-        // }
-
-
-        $('#create_session_button').click(function(){
-
-            $('.create_session_modal').modal('show');
-
-        });
-
-
-        $('.window_toggle').click(function(){
-
-            // primary_window_form_div
-            // window_toggle
-
-            // TODO: 
-                // full focus on this <-- get a lot done
-            // finish up the modal form and start CRUD on sessions (ui + functionality)
-
-            let parent_div = $(this).parent().parent().parent().parent();
-            // console.log(parent_div.find(':checkbox[name=tab_url]:checked'))
-            parent_div.find(':checkbox').prop("checked", $(this).prop('checked'))
-
-        });
-
-
-        $('#create_session_form_button').click(function(){
-
-            let requested_tabs = $('input[type="checkbox"][name="cb_tab_url"]:checked');
-            let session_name = $('#session_name').val();
-
-            let requested_tab_data = [];
-            for (i = 0; i <= requested_tabs.length-1; i++){
-                // requested_tab_data.push(requested_tabs[i].value)
-                let current_tb_url = requested_tabs[i].value;
-                let current_tb_data = tab_dict[current_tb_url];
-                requested_tab_data.push(current_tb_data);
-            }
-
-            $.ajax({
-                type : 'POST',
-                url : "{{ url_for('create_session') }}",
-                contentType: 'application/json;charset=UTF-8',
-                data : JSON.stringify({
-                    'session_name': session_name,
-                    'requested_tabs': requested_tab_data
-                }),
-                success: function(res){
-                    // TODO: redirect to saved sessions page
-                }
-            });
-
-        });
-
-
     </script>
 
 </body>
 
-</html>

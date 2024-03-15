@@ -65,8 +65,12 @@ def home():
         'final_window_tab_list': final_window_tab_list
     }
 
+    if request.method == 'POST':
+        pass
+
     return render_template(
-        'new_home_one.html',
+        # 'new_home_one.html',
+        'new_home_two.html',
         value = rv
     )
 
@@ -103,6 +107,40 @@ def home():
     #     'new_home_one.html',
     #     value = rv
     # )
+
+
+@app.route('/sessions', methods=['GET', 'POST'])
+def saved_sessions():
+    cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+
+    sql = 'select * from saved_session order by created_timestamp desc'
+    cur.execute(sql)
+    user_sessions = cur.fetchall()
+
+    c = 1
+    final_sessions_list = []
+    final_sessions_id_list = []
+    for sdict in user_sessions:
+        sql = 'select * from saved_session_url where session_object_id = %s'
+        cur.execute(sql, (sdict['id'],))
+        session_tab_urls = cur.fetchall()
+        final_sessions_list.append({
+            'session_object_id': sdict['id'],
+            'current_count': c,
+            'session': sdict,
+            'tabs': session_tab_urls    
+        })
+        final_sessions_id_list.append(f"session_{sdict['id']}")
+        c += 1
+
+    rv = {
+        'final_sessions_id_list': final_sessions_id_list,
+        'final_sessions_list': final_sessions_list
+    }
+
+    return render_template('saved_sessions.html', value = rv)
+
+
 
 
 @app.route('/refresh_windows', methods=['POST'])
@@ -153,6 +191,36 @@ def refresh_window():
             g.db.commit()
 
     return {'success': True}
+
+
+
+@app.route('/create_session', methods=['POST'])
+def create_session():
+    print('post-data:', request.json)
+
+    session_name = request.json['session_name']
+    requested_tab_data = request.json['requested_tabs']
+    
+    cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    
+    sql = 'INSERT INTO saved_session(session_name) values (%s) RETURNING id;'
+    cur.execute(sql, (session_name,))
+    g.db.commit()
+    
+    saved_session_object_id = cur.fetchone()['id']
+
+    for tb_dict in requested_tab_data:
+        tb_url = tb_dict['url']
+        tb_title = tb_dict['title']
+        tb_favicon_url = tb_dict['favicon_url']
+
+        sql = 'insert into saved_session_url(title, url, favicon_url, session_object_id) values (%s, %s, %s, %s)'
+        cur.execute(sql, (tb_title, tb_url, tb_favicon_url, saved_session_object_id,))
+        g.db.commit()
+
+    return {'success': True}
+
+
 
 
 
