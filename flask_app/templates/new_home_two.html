@@ -13,7 +13,7 @@
                     <i class="window restore icon"></i>
                     Current Windows
                 </a>
-                &nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;
                 <a class="item">
                     <i class="window restore icon"></i>
                     Saved Sessions
@@ -28,12 +28,12 @@
 
                         <div class="ui header primary-card-button-div">
 
-                            <div >
-                                <button class="ui small button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)">Close Window</button>
+                            <div>
+                                <button class="ui small button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)"><i class="close icon"></i>Close Window</button>
                                 &nbsp;
-                                <button class="ui small black button" id="refresh_active_sessions" onclick="refreshSession()">Refresh Tabs</button>
-                                &nbsp;
-                                <button class="ui small black button" id="create_session_button">Create New Session</button>
+                                <button class="ui small button" id="refresh_active_sessions" onclick="refreshSession()"><i class="sync icon"></i>Refresh Tabs</button>
+                                <!-- &nbsp;
+                                <button class="ui small button" id="create_session_button">Create New Session</button> -->
                             </div>
     
                         </div>
@@ -99,6 +99,61 @@
 
     </div>
 
+    <div class="ui small modal create_session_modal">
+        <div class="header">Create new session</div>
+        <div class="content">
+        
+            <!-- <form class="ui form" > -->
+            <div class="field" style="width: 40%;">
+                <label>Session Name</label>
+                <input type="text" id="session_name" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
+            </div>
+
+            <br/>
+            {% for wdi in value['final_window_tab_list'] %}
+
+                <div class="primary_window_form_div">
+
+                    <h4>
+                        {{ wdi['window_title'] }}
+                        &nbsp;
+                        <span>
+                            <div class="ui slider checkbox">
+                                <input type="checkbox" class="window_toggle">
+                                <label>Select All</label>
+                            </div>
+                        </span>
+                    </h4>
+    
+                <!-- TODO: continue with finalizing UI + functionality (together); go from there -->
+
+                    <div class="ui list">
+                    {% for tdi in wdi['tabs'] %}
+    
+                        <div class="ui checkbox item">
+                            <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
+                            <label>
+                                <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                    {{ tdi['title'] }}
+                                </a>
+                            </label>
+                        </div>
+    
+                    {% endfor %}
+                    </div>
+
+                </div>
+                <br/>
+
+            {% endfor %}
+            <!-- </form> -->
+
+        </div>
+        <div class="actions">
+            <div id="create_session_form_button" class="ui black approve button">Submit</div>
+            <div class="ui cancel button">Cancel</div>
+        </div>
+    </div>
 
     <script>
 
@@ -144,6 +199,13 @@
         }
         
         $('#' + current_window_id).show();
+
+
+        $('#create_session_button').click(function(){
+
+            $('.create_session_modal').modal('show');
+
+        });
 
 
     </script>
