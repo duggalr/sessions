@@ -1,15 +1,21 @@
 .top-menu{
-    padding-left: 15px;
-    padding-right: 40px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 15px;
 }
 
 .top-menu-logo{
-    font-size: 26px !important;
+    font-size: 26.5px !important;
     padding-top: 15px !important;
+}
+
+.top-menu .item{
+    font-size: 15.5px;
+    /* padding-top: 10px; */
 }
 
 .ui.menu .active.item{
     font-weight: bold;
-    text-decoration: underline;
+    /* text-decoration: underline; */
     background: none !important;
 }
