@@ -27,7 +27,7 @@
 
                     <div id="window_{{ wdi['window_object_id'] }}" class="primary-card-div" style="display: none;">
 
-                        <!-- <div class="ui header primary-card-button-div">
+                        <div class="ui header primary-card-button-div">
 
                             <div>
                                 <button class="ui small button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)"><i class="close icon"></i>Close Window</button>
@@ -35,31 +35,31 @@
                                 <button class="ui small button" id="refresh_active_sessions" onclick="refreshSession()"><i class="sync icon"></i>Refresh Tabs</button>
                             </div>
     
-                        </div> -->
+                        </div>
 
-                        <div class="ui header" style="font-size: 20px;">
+                        <div class="ui header window-header" style="font-size: 20px;">
                             {{ wdi['window_title'] }}
                             &nbsp;
 
                             <span id="window_right_arrow_span">
                                 <i class="arrow left icon window_left_arrow"></i>
-                                <!-- &nbsp; -->
                                 <i class="arrow right icon window_right_arrow"></i>
                                 <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
                             </span>
                             
-                            <div style="float: right;">
+                            <!-- <div style="float: right;">
                                 <button class="ui medium black button" id="open_session" onclick="">Open</button>
                                 &nbsp;
                                 <button class="ui medium button" onclick="">Update</button>
                                 &nbsp;
                                 <button class="ui medium button" onclick="">Delete</button>
-                            </div>
+                            </div> -->
 
                         </div>
 
+                        <span class="window-header-date">Last Updated: {{ wdi['window']['fetched_timestamp'].strftime('%Y-%m-%d') }}</span>
 
-                        <div class="ui card window-card" style="width: 100%; margin-top: 6.5%;">
+                        <div class="ui card window-card" style="width: 100%; margin-top: 3.5%;">
                 
                             <div class="content">
                                 <h2 class="ui sub header" style="font-size: 16px;">
@@ -121,7 +121,7 @@
 
                     <div id="session_{{ session_dict['session_object_id'] }}" style="display: none;">
 
-                        <div class="ui header" style="font-size: 20px;">
+                        <div class="ui header session-header" style="font-size: 20px;">
                             {{ session_dict['session']['session_name'] }}
                             &nbsp;
 
@@ -132,17 +132,19 @@
                                 <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span>
                             </span>
                             
-                            <div style="float: right;">
+                            <!-- <div style="float: right;">
                                 <button class="ui medium black button" id="open_session" onclick="">Open</button>
                                 &nbsp;
                                 <button class="ui medium button" onclick="">Update</button>
                                 &nbsp;
                                 <button class="ui medium button" onclick="">Delete</button>
-                            </div>
+                            </div> -->
 
                         </div>
 
-                        <div class="ui card" style="width: 100%; margin-top: 6.5%;">
+                        <span class="session-header-date">Created: {{ session_dict['session']['created_timestamp'].strftime('%Y-%m-%d') }}</span>
+
+                        <div class="ui card" style="width: 100%; margin-top: 3.5%;">
                 
                             <div class="content">
                                 <h2 class="ui sub header" style="font-size: 16px;">

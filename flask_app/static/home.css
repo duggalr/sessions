@@ -1,10 +1,9 @@
 .window-text-menu .item{
-    font-size: 15.5px;
+    font-size: 15px;
 }
 
-
-.current_windows_parent_div{
-    /* margin-top: 25px; */
+.current_windows_parent_div, .saved_sessions_parent_div{
+    margin-top: 25px;
 }
 
 .primary-card-div{
@@ -21,3 +20,18 @@
     width: 100%; 
     /* margin-top: 6.5%; */
 }
+
+.window_left_arrow, .window_right_arrow, .session_left_arrow, .session_right_arrow:hover{
+    cursor: pointer;
+    /* color: lightblue; */
+}
+
+.window-header, .session-header{
+    margin: 0rem !important;
+}
+
+.window-header-date, .session-header-date{
+    color: gray;
+    font-size: 13.5px;
+}
+
