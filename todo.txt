@@ -6,4 +6,6 @@ add favicon
 # TODO: 
     # refactor DB first
     # proceed from there
-    
+
+<!-- TODO: complete saved sessions UI + CRUD on saved sessions  -->
+

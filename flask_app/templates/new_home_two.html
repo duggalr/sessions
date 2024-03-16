@@ -9,12 +9,12 @@
         <div class="ten wide column">
 
             <div class="ui text menu window-text-menu">
-                <a class="active item">
+                <a class="active item" id="current_window_item">
                     <i class="window restore icon"></i>
                     Current Windows
                 </a>
                 &nbsp;&nbsp;&nbsp;
-                <a class="item">
+                <a class="item" id="saved_session_item">
                     <i class="window restore icon"></i>
                     Saved Sessions
                 </a>
@@ -25,19 +25,39 @@
 
                 {% for wdi in value['final_window_tab_list'] %}
 
-                    <div id="window_{{ wdi['window_object_id'] }}" class="primary-card-div">
+                    <div id="window_{{ wdi['window_object_id'] }}" class="primary-card-div" style="display: none;">
 
-                        <div class="ui header primary-card-button-div">
+                        <!-- <div class="ui header primary-card-button-div">
 
                             <div>
                                 <button class="ui small button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)"><i class="close icon"></i>Close Window</button>
                                 &nbsp;
                                 <button class="ui small button" id="refresh_active_sessions" onclick="refreshSession()"><i class="sync icon"></i>Refresh Tabs</button>
-                                <!-- &nbsp;
-                                <button class="ui small button" id="create_session_button">Create New Session</button> -->
                             </div>
     
+                        </div> -->
+
+                        <div class="ui header" style="font-size: 20px;">
+                            {{ wdi['window_title'] }}
+                            &nbsp;
+
+                            <span id="window_right_arrow_span">
+                                <i class="arrow left icon window_left_arrow"></i>
+                                <!-- &nbsp; -->
+                                <i class="arrow right icon window_right_arrow"></i>
+                                <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
+                            </span>
+                            
+                            <div style="float: right;">
+                                <button class="ui medium black button" id="open_session" onclick="">Open</button>
+                                &nbsp;
+                                <button class="ui medium button" onclick="">Update</button>
+                                &nbsp;
+                                <button class="ui medium button" onclick="">Delete</button>
+                            </div>
+
                         </div>
+
 
                         <div class="ui card window-card" style="width: 100%; margin-top: 6.5%;">
                 
@@ -94,10 +114,8 @@
 
             </div>
 
-
             <!-- Saved Sessions -->
-            <!-- TODO: complete saved sessions UI + CRUD on saved sessions  -->
-            <div class="saved_sessions_parent_div">
+            <div class="saved_sessions_parent_div" style="display: none;">
 
                 {% for session_dict in value['final_sessions_list'] %}
 
@@ -108,9 +126,9 @@
                             &nbsp;
 
                             <span id="window_right_arrow_span">
-                                <i class="arrow left icon window_left_arrow"></i>
+                                <i class="arrow left icon session_left_arrow"></i>
                                 <!-- &nbsp; -->
-                                <i class="arrow right icon window_right_arrow"></i>
+                                <i class="arrow right icon session_right_arrow"></i>
                                 <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span>
                             </span>
                             
@@ -232,6 +250,15 @@
 
     <script>
 
+        let current_window_id;
+        let current_session_id;
+        let url_param_value;
+        let showSession = false;
+        let url = new URL(location.href);
+
+        let final_sessions_id_list = {{ value['final_sessions_id_list']|safe }};
+        let final_sessions_list = {{ value['final_sessions_list']|tojson }};
+
         let final_window_id_list = {{ value['final_window_id_list']|safe }};
         let final_window_tab_list = {{ value['final_window_tab_list']|tojson }};
 
@@ -248,38 +275,254 @@
             };
         };
 
-        let current_window_id;
-        let url = new URL(location.href);
-        let c = url.searchParams.get("c");
 
-        if (c == null){
 
-            c = 0;
-            current_window_id = final_window_id_list[c];
-            $('.window_left_arrow').hide();
+        function updateView(showSession, val){
+
+            // console.log(showSession, val)
+
+            if (val == null){
+
+                // val = 0;
+                url_param_value = 0;
+
+                if (showSession === true){
+
+                    for (i=0; i<=final_sessions_id_list.length-1; i++){
+                        $('#' + final_sessions_id_list[i]).hide();
+                    };
+
+                    current_session_id = final_sessions_id_list[url_param_value];
+                    $('#' + current_session_id).show();
+
+                } else {
+
+                    for (i=0; i<=final_window_id_list.length-1; i++){
+                        $('#' + final_window_id_list[i]).hide();
+                    };
+
+                    current_window_id = final_window_id_list[url_param_value];
+                    $('#' + current_window_id).show();
+
+                }
+
+            } else {
+
+                if (showSession === true){
+                 
+                    if ( val <= final_sessions_id_list.length-1 && val > 0){
+
+                        for (i=0; i<=final_sessions_id_list.length-1; i++){
+                            $('#' + final_sessions_id_list[i]).hide();
+                        };
+
+                        url_param_value = val;
+                        current_session_id = final_sessions_id_list[val];
+                        $('#' + current_session_id).show();
+
+                    } else {
+
+                        for (i=0; i<=final_sessions_id_list.length-1; i++){
+                            $('#' + final_sessions_id_list[i]).hide();
+                        };
+
+                        val = 0;
+                        url_param_value = val;
+                        current_session_id = final_sessions_id_list[val];
+                        $('#' + current_session_id).show();
+
+                    }
+                    
+                } else {
+
+                    if (val <= final_window_id_list.length-1 && val > 0){
+
+                        for (i=0; i<=final_window_id_list.length-1; i++){
+                            $('#' + final_window_id_list[i]).hide();
+                        };
+
+                        url_param_value = val;
+                        current_window_id = final_window_id_list[val];
+                        $('#' + current_window_id).show();
+
+                    } else {
+
+                        for (i=0; i<=final_window_id_list.length-1; i++){
+                            $('#' + final_window_id_list[i]).hide();
+                        };
+
+                        val = 0;
+                        url_param_value = val;
+                        current_window_id = final_window_id_list[val];
+                        window.history.replaceState(null, '', window.location.pathname);
+                        // $('.window_left_arrow').hide();
+                        $('#' + current_window_id).show();
+
+                    }
+
+                }
+                
+            }
+
+        };
+
+        if (showSession === true){
+        
+            url_param_value = url.searchParams.get("s");
+            updateView(showSession, url_param_value);
 
         } else {
 
-            if (c <= final_window_id_list.length-1 && c > 0){
+            url_param_value = url.searchParams.get("c");
+            updateView(showSession, url_param_value);
 
-                current_window_id = final_window_id_list[c];
-                $('.window_left_arrow').show();
+        };
 
-            } else {
-                current_window_id = final_window_id_list[0];
-                window.history.replaceState(null, '', window.location.pathname);
-                $('.window_left_arrow').hide();
-            }
 
-        }
+//         if (showSession === true){
+
+// url_param_value = url.searchParams.get("s");
+
+// } else {
+
+// url_param_value = url.searchParams.get("c");
+
+// }
+
+// if (url_param_value == null){
+
+// if (showSession === true){
+
+//     url_param_value = 0;
+//     current_session_id = final_sessions_id_list[url_param_value];
+//     $('#' + current_session_id).show();
+
+// } else {
+
+//     url_param_value = 0;
+//     current_window_id = final_window_id_list[url_param_value];
+//     // $('.window_left_arrow').hide();
+//     $('#' + current_window_id).show();
+
+// }
+
+// } 
+        // else {
+
+        //     if (c <= final_window_id_list.length-1 && c > 0){
+
+        //         current_window_id = final_window_id_list[c];
+        //         $('.window_left_arrow').show();
+
+        //     } else {
+
+        //         current_window_id = final_window_id_list[0];
+        //         window.history.replaceState(null, '', window.location.pathname);
+        //         $('.window_left_arrow').hide();
+
+        //     }
+
+        // }
+
+
+        // if (c == null){
+
+        //     c = 0;
+        //     current_window_id = final_window_id_list[c];
+        //     $('.window_left_arrow').hide();
+
+        // } else {
+
+        //     if (c <= final_window_id_list.length-1 && c > 0){
+
+        //         current_window_id = final_window_id_list[c];
+        //         $('.window_left_arrow').show();
+
+        //     } else {
+        //         current_window_id = final_window_id_list[0];
+        //         window.history.replaceState(null, '', window.location.pathname);
+        //         $('.window_left_arrow').hide();
+        //     }
+
+        // }
         
-        $('#' + current_window_id).show();
+        // $('#' + current_window_id).show();
 
 
-        $('#create_session_button').click(function(){
+        // final_sessions_id_list = {{ value['final_sessions_id_list']|safe }};
+        // final_sessions_list = {{ value['final_sessions_list']|safe }};
+        
+        
+        // let current_session_id;
 
-            $('.create_session_modal').modal('show');
+        $('#saved_session_item').click(function(){
 
+            $('.saved_sessions_parent_div').show();
+            $('.current_windows_parent_div').hide();
+
+            $('#current_window_item').removeClass('active');
+            $('#saved_session_item').addClass('active');
+
+            showSession = true;
+            updateView(showSession, 0);
+
+        });
+
+        $('#current_window_item').click(function(){
+
+            $('.saved_sessions_parent_div').hide();
+            $('.current_windows_parent_div').show();
+
+            $('#current_window_item').addClass('active');
+            $('#saved_session_item').removeClass('active');
+
+            showSession = false;
+            updateView(showSession, 0);
+
+        });
+        
+
+        // $('#create_session_button').click(function(){
+
+        //     $('.create_session_modal').modal('show');
+
+        // });
+
+
+        $('.window_left_arrow').click(function(){
+
+            console.log('current_window_id-old', current_window_id, url_param_value)
+
+            showSession = false;
+            let possible_new_id = url_param_value - 1;
+            updateView(showSession, possible_new_id);
+
+        });
+
+        $('.window_right_arrow').click(function(){
+
+            console.log('current_window_id-old', current_window_id, url_param_value)
+
+            showSession = false;
+            let possible_new_id = url_param_value + 1;
+            updateView(showSession, possible_new_id);
+
+        });
+
+        
+        $('.session_left_arrow').click(function(){
+
+            showSession = true;
+            let possible_new_id = url_param_value - 1;
+            updateView(showSession, possible_new_id);
+        });
+
+        $('.session_right_arrow').click(function(){
+
+            showSession = true;
+            let possible_new_id = url_param_value + 1;
+            updateView(showSession, possible_new_id);
+            
         });
 
 
