@@ -223,6 +223,15 @@ chrome.runtime.onMessage.addListener(
 
         }
 
+        else if (request['type'] == 'open_session'){
+
+            var data = request['data'];
+            chrome.windows.create({'url': data}, function(res){
+                console.log('wc-res:', res);
+            });
+
+        }
+
     }
 
 );

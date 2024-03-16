@@ -20,16 +20,16 @@ window.addEventListener("message", function(event) {
       chrome.runtime.sendMessage({type: 'refresh_session'})
     }
 
-    // else if (event.data.type == 'open_session'){
-    //   // console.log('d:', event)
-    //   chrome.runtime.sendMessage({type: 'open_session', 'data': event.data.data}, function(response){})
-    // }
-
     else if (event.data.type == 'remove_window'){
 
       var window_id = event.data['window_id'];
       chrome.runtime.sendMessage({type: 'remove_window', 'data': {'window_id': window_id}}, function(response){})
 
+    }
+
+    else if (event.data.type == 'open_session'){
+      // console.log('d:', event)
+      chrome.runtime.sendMessage({type: 'open_session', 'data': event.data.data}, function(response){})
     }
 
   }

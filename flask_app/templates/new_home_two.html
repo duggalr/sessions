@@ -37,7 +37,7 @@
     
                         </div>
 
-                        <div class="ui header window-header" style="font-size: 20px;">
+                        <div class="ui header window-header" >
                             {{ wdi['window_title'] }}
                             &nbsp;
 
@@ -121,7 +121,19 @@
 
                     <div id="session_{{ session_dict['session_object_id'] }}" style="display: none;">
 
-                        <div class="ui header session-header" style="font-size: 20px;">
+
+                        <div class="ui header primary-card-button-div">
+
+                            <div>
+                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="deleteUserSession(this.id)"><i class="close icon"></i>Delete Session</button>
+                                &nbsp;
+                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="openUserSession(this.id)"><i class="sync icon"></i>Open Session</button>
+                            </div>
+    
+                        </div>
+
+
+                        <div class="ui header session-header">
                             {{ session_dict['session']['session_name'] }}
                             &nbsp;
 
@@ -264,6 +276,7 @@
         let final_window_id_list = {{ value['final_window_id_list']|safe }};
         let final_window_tab_list = {{ value['final_window_tab_list']|tojson }};
 
+        
         let tab_dict = {};
         for (i=0; i<=final_window_tab_list.length-1; i++){
             let wdict = final_window_tab_list[i];
@@ -277,6 +290,20 @@
             };
         };
 
+
+        let user_session_dict = {};
+        for (i=0; i<=final_sessions_list.length-1; i++){
+            let sdict = final_sessions_list[i];
+            let session_obj_id = sdict['session_object_id'];
+            let session_tabs = sdict['tabs'];
+            let session_urls = [];
+            for (y=0; y<=session_tabs.length-1; y++){
+                let s_tb_list = session_tabs[y];
+                let s_url = s_tb_list[2];
+                session_urls.push(s_url);
+            };
+            user_session_dict[session_obj_id] = session_urls;
+        };
 
 
         function updateView(showSession, val){
@@ -380,83 +407,6 @@
 
         };
 
-
-//         if (showSession === true){
-
-// url_param_value = url.searchParams.get("s");
-
-// } else {
-
-// url_param_value = url.searchParams.get("c");
-
-// }
-
-// if (url_param_value == null){
-
-// if (showSession === true){
-
-//     url_param_value = 0;
-//     current_session_id = final_sessions_id_list[url_param_value];
-//     $('#' + current_session_id).show();
-
-// } else {
-
-//     url_param_value = 0;
-//     current_window_id = final_window_id_list[url_param_value];
-//     // $('.window_left_arrow').hide();
-//     $('#' + current_window_id).show();
-
-// }
-
-// } 
-        // else {
-
-        //     if (c <= final_window_id_list.length-1 && c > 0){
-
-        //         current_window_id = final_window_id_list[c];
-        //         $('.window_left_arrow').show();
-
-        //     } else {
-
-        //         current_window_id = final_window_id_list[0];
-        //         window.history.replaceState(null, '', window.location.pathname);
-        //         $('.window_left_arrow').hide();
-
-        //     }
-
-        // }
-
-
-        // if (c == null){
-
-        //     c = 0;
-        //     current_window_id = final_window_id_list[c];
-        //     $('.window_left_arrow').hide();
-
-        // } else {
-
-        //     if (c <= final_window_id_list.length-1 && c > 0){
-
-        //         current_window_id = final_window_id_list[c];
-        //         $('.window_left_arrow').show();
-
-        //     } else {
-        //         current_window_id = final_window_id_list[0];
-        //         window.history.replaceState(null, '', window.location.pathname);
-        //         $('.window_left_arrow').hide();
-        //     }
-
-        // }
-        
-        // $('#' + current_window_id).show();
-
-
-        // final_sessions_id_list = {{ value['final_sessions_id_list']|safe }};
-        // final_sessions_list = {{ value['final_sessions_list']|safe }};
-        
-        
-        // let current_session_id;
-
         $('#saved_session_item').click(function(){
 
             $('.saved_sessions_parent_div').show();
@@ -489,7 +439,6 @@
         //     $('.create_session_modal').modal('show');
 
         // });
-
 
         $('.window_left_arrow').click(function(){
 
@@ -528,6 +477,61 @@
         });
 
 
+        function openUserSession(session_id){
+
+            console.log('session-id:', session_id)
+            let session_tab_url_list = user_session_dict[session_id];
+
+            if (session_tab_url_list != undefined){
+
+                var data = { type: "open_session", data: session_tab_url_list };
+                window.postMessage(data, "*");    
+
+            }
+
+        };
+
+        function deleteUserSession(session_id){
+
+            console.log('sessionid:', session_id)
+
+            if (confirm('Are you sure you want to delete this saved session?')) {
+
+                $.ajax({
+                    type : 'POST',
+                    url : "{{ url_for('delete_session') }}",
+                    contentType: 'application/json;charset=UTF-8',
+                    data : JSON.stringify({
+                        'session_id': session_id
+                    }),
+                    success: function(res){
+                        window.location.reload();
+                    }
+                });
+
+            } 
+
+        };
+
+        function removeWindow(window_id){
+
+            console.log('window-delete:', window_id);
+            var data = { type: "remove_window", window_id: window_id };
+            window.postMessage(data, "*");
+
+        };
+
+        function refreshSession(){
+
+            var data = { type: "refresh_session" };
+            window.postMessage(data, "*");
+
+        };
+
+
+
+
+        
     </script>
 
 {% endblock %}

@@ -246,6 +246,18 @@ def create_session():
 
 
 
+@app.route('/delete_session', methods=['POST'])
+def delete_session():
+    print('post-data:', request.json)
+
+    session_id = request.json['session_id']
+    cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    sql = 'DELETE FROM saved_session where id = %s'
+    cur.execute(sql, (session_id,))
+    g.db.commit()
+
+    return {'success': True}
+
 
 
 

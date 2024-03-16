@@ -28,10 +28,12 @@
 
 .window-header, .session-header{
     margin: 0rem !important;
+    font-size: 18.5px !important;
 }
 
 .window-header-date, .session-header-date{
     color: gray;
+    /* padding-top: 5px; */
     font-size: 13.5px;
 }
 
