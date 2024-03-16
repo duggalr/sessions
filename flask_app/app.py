@@ -60,9 +60,33 @@ def home():
         final_window_id_list.append(f"window_{ wdi['id'] }")
         c += 1
 
+
+    # Fetching saved user sessions
+    sql = 'select * from saved_session order by created_timestamp desc'
+    cur.execute(sql)
+    user_sessions = cur.fetchall()
+
+    c = 1
+    final_sessions_list = []
+    final_sessions_id_list = []
+    for sdict in user_sessions:
+        sql = 'select * from saved_session_url where session_object_id = %s'
+        cur.execute(sql, (sdict['id'],))
+        session_tab_urls = cur.fetchall()
+        final_sessions_list.append({
+            'session_object_id': sdict['id'],
+            'current_count': c,
+            'session': sdict,
+            'tabs': session_tab_urls    
+        })
+        final_sessions_id_list.append(f"session_{sdict['id']}")
+        c += 1
+
     rv = {
         'final_window_id_list': json.dumps(final_window_id_list),
-        'final_window_tab_list': final_window_tab_list
+        'final_window_tab_list': final_window_tab_list,
+        'final_sessions_id_list': final_sessions_id_list,
+        'final_sessions_list': final_sessions_list
     }
 
     if request.method == 'POST':
