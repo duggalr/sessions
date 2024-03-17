@@ -21,8 +21,3 @@ def create_tab_dict(rw):
   # else: 
   #   windows_dict[window_id] = [{'tab_id': tab_id, 'title': tab_title, 'url': tab_url, 'fav_url': fav_url}]
 
-
-
-
-
-

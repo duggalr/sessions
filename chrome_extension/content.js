@@ -11,7 +11,6 @@ window.addEventListener("message", function(event) {
       console.log('removing tab-id:', tab_id)
 
       chrome.runtime.sendMessage({type: "remove_tab", 'data': {'tab_id': tab_id}}, function(response) {  
-        // console.log('bckjs-res:', response)
       });
 
     }
@@ -28,20 +27,9 @@ window.addEventListener("message", function(event) {
     }
 
     else if (event.data.type == 'open_session'){
-      // console.log('d:', event)
       chrome.runtime.sendMessage({type: 'open_session', 'data': event.data.data}, function(response){})
     }
 
   }
-
-  // console.log(chrome.tabs.remove())
-
-  // // We only accept messages from ourselves
-  // if (event.source != window)
-  //     return;
-
-  // if (event.data.type && (event.data.type == "FROM_PAGE")) {
-  //     console.log("Content script received message: " + event.data.text);
-  // }
 
 });

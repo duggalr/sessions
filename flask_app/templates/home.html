@@ -1,125 +1,831 @@
+{% extends 'base.html' %}
 
+{% block content %}
 
-<h2>Manage Windows</h2>
-
-<!-- <form method="post"> -->
-  
-  <!-- <input type="text" id="session_name" name="session_name"><br><br> -->
-  
-  <button id="refresh_active_sessions" onclick="refreshSession()">Refresh Windows/Tabs</button>
-
-  {% for window_id in windows %} 
-
-    <h3>
-      Window {{ window_id }}
-      <input type="checkbox" id="window_id_{{ window_id }}" name="window_{{ window_id }}" value="{{ window_id }}">
-    </h3> 
-    <ul>
-      {% for di in windows[window_id] %}
-        <li>
-          <!-- <img src="{{ di['fav_url'] }}"> -->
-          <a href="{{ di['url'] }}">
-            {{ di['title'] }} 
-          </a>
-          &nbsp;&nbsp;&nbsp;
-          <button id="{{ di['tab_id'] }}" onclick="deleteTab(this.id)">Delete Tab</button>
-
-        </li>
-        <br/>
-      {% endfor %}
-    </ul>
-
-  {% endfor %}
-
-  <!-- <input type="submit" value="Submit"> -->
-
-<!-- </form> -->
-
-<br/>
-
-
-<h2>Manage Sessions</h2>
-
-{% for session_title in sessions %}
-
-  <h3>
-    {{ session_title }}
-    <!-- <a href="{{ url_for('delete_session', name=session_title) }}">delete session</a> -->
-    <a href="#" id="{{ session_title }}" onclick="deleteSession(this.id)">delete session</a>
-    <a href="{{ url_for('open_session', name=session_title) }}">open session</a>
-  </h3>
-  
-  <ul>
-    {% for di in sessions[session_title] %}
-      <li style="padding-top: 6px;">
-        <!-- <img src="{{ di['fav_url'] }}"> -->
-        <a href="{{ di['tab_url'] }}">
-          {{ di['tab_title'] }}
-        </a>      
-      </li>
-    {% endfor %}
-  </ul>
-
-{% endfor %}
-
-
-
-<script>
-
-  // $('#delete_tab_button').click(function(){
-  //   console.log('button-clicked')
-
-  // })
-
-
-
-  // function sendMsg(data){
-  //   return new Promise(function(resolve, reject){
-  //     window.postMessage(data, "*");
-  //   })
+    <div class="ui grid container" >
+        
+        <div class="three wide column"></div>
     
-  // }
+        <div class="ten wide column">
 
+            <div class="ui text menu window-text-menu">
+                <a class="active item" id="current_window_item">
+                    <i class="window restore icon"></i>
+                    Current Windows
+                </a>
+                &nbsp;&nbsp;&nbsp;
+                <a class="item" id="saved_session_item">
+                    <i class="window restore icon"></i>
+                    Saved Sessions
+                </a>
+            </div>
 
-  function deleteTab(tab_id){
+            <!-- Current Windows -->
+            <div class="current_windows_parent_div">
 
-    console.log('tab-delete:', tab_id)
-    // TODO: prevent malicious requests here (ie. user sends list of tab-id's to delete upon site-visit)?
-    var data = { type: "remove_tab", tabID: tab_id };
-    window.postMessage(data, "*");
-    refreshSession();
+                {% for wdi in value['final_window_tab_list'] %}
 
-  }
+                    <div id="window_{{ wdi['window_object_id'] }}" class="primary-card-div" style="display: none;">
 
+                        <div class="ui header primary-card-button-div">
 
-  function deleteSession(session_title){
-    console.log('ses-title:', session_title)
-
-    let text = "You sure you want to delete session?";
-    if (confirm(text) == true) {
-      console.log('deleting session')
-      window.location.href = 'http://127.0.0.1:5000/delete_session/' + session_title
-
-    } else {
-      console.log('cancel')
-    }
+                            <div>
+                                <button class="ui small button" id="{{ wdi['window']['google_id'] }}" onclick="removeWindow(this.id)"><i class="close icon"></i>Close Window</button>
+                                &nbsp;
+                                <button class="ui small button" id="refresh_active_sessions" onclick="refreshSession()"><i class="sync icon"></i>Refresh Tabs</button>
+                            </div>
     
-    return false;
-  }
+                        </div>
 
-  function refreshSession(){
+                        <div class="ui header window-header" >
+                            {{ wdi['window_title'] }}
+                            &nbsp;
 
-    var data = { type: "refresh_session" };
-    window.postMessage(data, "*");
+                            {% if value['final_window_tab_list']|length > 0 %}
 
-  }
+                                <span id="window_right_arrsow_span">
+                                    <i class="arrow left icon window_left_arrow"></i>
+                                    <i class="arrow right icon window_right_arrow"></i>
+                                    <!-- <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span> -->
+                                </span>
+
+                            {% endif %}
+                            
+                            <!-- <div style="float: right;">
+                                <button class="ui medium black button" id="open_session" onclick="">Open</button>
+                                &nbsp;
+                                <button class="ui medium button" onclick="">Update</button>
+                                &nbsp;
+                                <button class="ui medium button" onclick="">Delete</button>
+                            </div> -->
+
+                        </div>
+
+                        <span class="window-header-date">Last Updated: {{ wdi['window']['fetched_timestamp'].strftime('%Y-%m-%d') }}</span>
+
+                        <div class="ui card window-card" style="width: 100%; margin-top: 3.5%;">
+                
+                            <div class="content">
+                                <h2 class="ui sub header" style="font-size: 16px;">
+                                    Tabs ({{ wdi['tabs']|length }})                                    
+                                    {% if wdi['window']['focused'] %}
+                                        <a class="ui blue label" style="float: right;">active</a>
+                                    {% else %}
+                                        <a class="ui blue label" style="float: right;">{{ wdi['window']['state'] }}</a>
+                                    {% endif %}
+                                </h2>
+                            </div>
+            
+                            <div class="content">
+            
+                                <div class="ui small feed" >
+
+                                    {% for tdi in wdi['tabs'] %}
+            
+                                        <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
+                                            <div class="content">
+                                                <div class="summary">
+                                                    <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
+                                                    <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                                        {{ tdi['title'] }}
+                                                    </a>
+                                                    <span class="trash_span" style="float: right; font-size: 15px; color: red;" id="{{ tdi['google_id'] }}" onclick="deleteTab(this.id)">
+                                                        <i class="trash alternate outline icon"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+            
+                                        <div style="border-bottom: 0.5px solid lightgrey;"></div>
+            
+                                    {% endfor %}
+            
+                                </div>
+            
+                            </div>
+
+                            <!-- <div class="actions" style="padding-bottom: 10px;">
+                                <div class="ui right floated approve button">Approve</div>
+                                <div class="ui right floated button">Neutral</div>
+                                <div class="ui right floated cancel button">Cancel</div>
+                            </div> -->
+            
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <!-- Saved Sessions -->
+
+            {% if value['final_sessions_list']|length > 0 %}
+
+                <div class="saved_sessions_parent_div" style="display: none;">
+
+                    {% for session_dict in value['final_sessions_list'] %}
+
+                        <div id="session_{{ session_dict['session_object_id'] }}" style="display: none;">
+
+                            <div class="ui header primary-card-button-div">
+
+                                <div>
+                                    <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="deleteUserSession(this.id)"><i class="trash alternate icon"></i>Delete Session</button>
+                                    &nbsp;
+                                    <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="openUserSession(this.id)"><i class="eye icon"></i>Open Session</button>
+                                    &nbsp;
+                                    <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="updateUserSession(this.id)"><i class="edit icon"></i>Update Session</button>
+                                </div>
+        
+                            </div>
 
 
-</script>
+                            <div class="ui header session-header">
+                                {{ session_dict['session']['session_name'] }}
+                                &nbsp;
+
+                                {% if value['final_sessions_list']|length > 0 %}
+
+                                    <span id="window_right_arrow_span">
+                                        <i class="arrow left icon session_left_arrow"></i>
+                                        <!-- &nbsp; -->
+                                        <i class="arrow right icon session_right_arrow"></i>
+                                        <!-- <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span> -->
+                                    </span>
+
+                                {% endif %}
+                                
+                                <!-- <div style="float: right;">
+                                    <button class="ui medium black button" id="open_session" onclick="">Open</button>
+                                    &nbsp;
+                                    <button class="ui medium button" onclick="">Update</button>
+                                    &nbsp;
+                                    <button class="ui medium button" onclick="">Delete</button>
+                                </div> -->
+
+                            </div>
+
+                            <span class="session-header-date">Created: {{ session_dict['session']['created_timestamp'].strftime('%Y-%m-%d') }}</span>
+
+                            <div class="ui card" style="width: 100%; margin-top: 3.5%;">
+                    
+                                <div class="content">
+                                    <h2 class="ui sub header" style="font-size: 16px;">
+                                        Tabs ({{ session_dict['tabs']|length }})
+                                    </h2>
+                                </div>
+                
+                                <div class="content">
+                
+                                    <div class="ui small feed" >
+
+                                        {% for tdi in session_dict['tabs'] %}
+                
+                                            <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
+                                                <div class="content">
+                                                    <div class="summary">
+                                                        <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
+                                                        <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                                            {{ tdi['title'] }}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div style="border-bottom: 0.5px solid lightgrey;"></div>
+                
+                                        {% endfor %}
+                
+                                    </div>
+                
+                                </div>
+                
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+            
+            {% else %}
+
+                <div class="ui placeholder segment placeholder_saved_sessions_parent_div" style="display: none;">
+                    <div class="ui icon header">
+                        <i class="folder open icon" style="padding-bottom: 5px;"></i>
+                        No Saved Sessions.
+                    </div>
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+        <div class="three wide column"></div>
+
+    </div>
 
 
 
 
+    <!-- Create Session Modal -->
+    <div class="ui small modal create_session_modal">
+        <div class="header">Create new session</div>
+        <div class="content">
+        
+            <form class="ui form" >
+
+                <div class="field" style="width: 40%;">
+                    <label>Session Name</label>
+                    <input type="text" id="session_name" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
+                </div>
+
+                <br/>
+                {% for wdi in value['final_window_tab_list'] %}
+
+                    <div class="primary_window_form_div">
+
+                        <h4>
+                            {{ wdi['window_title'] }}
+                            &nbsp;
+                            <span>
+                                <div class="ui slider checkbox">
+                                    <input type="checkbox" class="window_toggle">
+                                    <label>Select All</label>
+                                </div>
+                            </span>
+                        </h4>
+        
+                        <div class="ui list">
+                            {% for tdi in wdi['tabs'] %}
+            
+                                <div class="ui checkbox item">
+                                    <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
+                                    <label>
+                                        <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                            {{ tdi['title'] }}
+                                        </a>
+                                    </label>
+                                </div>
+            
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                    <br/>
+
+                {% endfor %}
+
+            </form>
+
+        </div>
+        <div class="actions">
+            <div id="create_session_form_button" class="ui black approve button">Submit</div>
+            <div class="ui cancel button">Cancel</div>
+        </div>
+    </div>
 
 
+    <!-- Update Session Modal -->
+    <div class="ui small modal update_session_modal">
+        <div class="header">Update Session</div>
+        <div class="content">
+        
+            <form class="ui form" id="update_modal_form">
+
+                <div class="field" style="width: 40%;">
+                    <label>Session Name</label>
+                    <input type="text" id="update_form_session_name" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
+                </div>
+                <br/>
+
+                <div id="session_url_list"></div>
+
+            </form>
+
+        </div>
+        <div class="actions">
+            <div id="update_session_form_button" class="ui black approve button">Submit</div>
+            <div class="ui cancel button">Cancel</div>
+        </div>
+    </div>
+
+
+
+    <script>
+
+        let current_window_id;
+        let current_session_id;
+        let url_param_value;
+        let showSession = false;
+        let url = new URL(location.href);
+
+        let final_sessions_id_list = {{ value['final_sessions_id_list']|safe }};
+        let final_sessions_list = {{ value['final_sessions_list']|tojson }};
+
+        let final_window_id_list = {{ value['final_window_id_list']|safe }};
+        let final_window_tab_list = {{ value['final_window_tab_list']|tojson }};
+
+        let tab_dict = {};
+        for (i=0; i<=final_window_tab_list.length-1; i++){
+            let wdict = final_window_tab_list[i];
+            let window_tabs = wdict['tabs'];
+            for (y=0; y<=window_tabs.length-1; y++){
+                let w_tb_dict = window_tabs[y];
+                let tb_url = w_tb_dict[3];
+                let tb_title = w_tb_dict[2];
+                let tb_favicon_url = w_tb_dict[4];
+                tab_dict[tb_url] = {'url': tb_url, 'title': tb_title, 'favicon_url': tb_favicon_url}
+            };
+        };
+
+
+        let user_session_dict = {};
+        for (i=0; i<=final_sessions_list.length-1; i++){
+            let sdict = final_sessions_list[i];
+            let session_obj_id = sdict['session_object_id'];
+            let session_tabs = sdict['tabs'];
+            // let session_urls = [];
+            let session_info_list = [];
+            for (y=0; y<=session_tabs.length-1; y++){
+                let s_tb_list = session_tabs[y];
+                session_info_list.push({
+                    'session_name': sdict['session'][1],
+                    'tab_id': s_tb_list[0],
+                    'name': s_tb_list[1],
+                    'url': s_tb_list[2],
+                    'favicon_url': s_tb_list[3]
+                })
+                // let s_url = s_tb_list[2];
+                // session_urls.push(s_url);
+            };
+            user_session_dict[session_obj_id] = session_info_list;
+        };
+
+
+        function updateView(showSession, val){
+
+            $('.placeholder_saved_sessions_parent_div').hide();
+
+            if (val == null){
+
+                // val = 0;
+                url_param_value = 0;
+
+                if (showSession === true){
+
+                    for (i=0; i<=final_sessions_id_list.length-1; i++){
+                        $('#' + final_sessions_id_list[i]).hide();
+                    };
+
+                    current_session_id = final_sessions_id_list[url_param_value];
+                    $('#' + current_session_id).show();
+
+                } else {
+
+                    for (i=0; i<=final_window_id_list.length-1; i++){
+                        $('#' + final_window_id_list[i]).hide();
+                    };
+
+                    current_window_id = final_window_id_list[url_param_value];
+                    $('#' + current_window_id).show();
+
+                }
+
+            } else {
+
+                if (showSession === true){
+                 
+                    if ( val <= final_sessions_id_list.length-1 && val > 0){
+
+                        for (i=0; i<=final_sessions_id_list.length-1; i++){
+                            $('#' + final_sessions_id_list[i]).hide();
+                        };
+
+                        url_param_value = val;
+                        current_session_id = final_sessions_id_list[val];
+                        $('#' + current_session_id).show();
+
+                    } else {
+
+                        for (i=0; i<=final_sessions_id_list.length-1; i++){
+                            $('#' + final_sessions_id_list[i]).hide();
+                        };
+
+                        val = 0;
+                        url_param_value = val;
+                        current_session_id = final_sessions_id_list[val];
+                        $('#' + current_session_id).show();
+
+                    }
+                    
+                } else {
+
+                    if (val <= final_window_id_list.length-1 && val > 0){
+
+                        for (i=0; i<=final_window_id_list.length-1; i++){
+                            $('#' + final_window_id_list[i]).hide();
+                        };
+
+                        url_param_value = val;
+                        current_window_id = final_window_id_list[val];
+                        $('#' + current_window_id).show();
+
+                    } else {
+
+                        for (i=0; i<=final_window_id_list.length-1; i++){
+                            $('#' + final_window_id_list[i]).hide();
+                        };
+
+                        val = 0;
+                        url_param_value = val;
+                        current_window_id = final_window_id_list[val];
+                        window.history.replaceState(null, '', window.location.pathname);
+                        // $('.window_left_arrow').hide();
+                        $('#' + current_window_id).show();
+
+                    }
+
+                }
+                
+            }
+
+        };
+
+
+        if (showSession === true){
+
+            url_param_value = url.searchParams.get("s");
+            updateView(showSession, url_param_value);
+
+        } 
+        else {
+
+            url_param_value = url.searchParams.get("c");
+            updateView(showSession, url_param_value);
+
+        };
+        
+
+        $('#saved_session_item').click(function(){
+
+            $('.saved_sessions_parent_div').show();
+            $('.current_windows_parent_div').hide();
+
+            $('#current_window_item').removeClass('active');
+            $('#saved_session_item').addClass('active');
+
+            showSession = true;
+            
+            if (final_sessions_list.length == 0){
+
+                $('.placeholder_saved_sessions_parent_div').show();
+
+            } else {
+
+                updateView(showSession, 0);
+
+            }
+
+
+        });
+
+        $('#current_window_item').click(function(){
+
+            $('.saved_sessions_parent_div').hide();
+            $('.current_windows_parent_div').show();
+
+            $('#current_window_item').addClass('active');
+            $('#saved_session_item').removeClass('active');
+
+            showSession = false;
+            updateView(showSession, 0);
+
+        });
+        
+
+        $('.window_left_arrow').click(function(){
+
+            showSession = false;
+            let possible_new_id = url_param_value - 1;
+            updateView(showSession, possible_new_id);
+
+        });
+
+        $('.window_right_arrow').click(function(){
+
+            showSession = false;
+            let possible_new_id = url_param_value + 1;
+            updateView(showSession, possible_new_id);
+
+        });
+
+        
+        $('.session_left_arrow').click(function(){
+
+            showSession = true;
+            let possible_new_id = url_param_value - 1;
+            updateView(showSession, possible_new_id);
+        });
+
+        $('.session_right_arrow').click(function(){
+
+            showSession = true;
+            let possible_new_id = url_param_value + 1;
+            updateView(showSession, possible_new_id);
+            
+        });
+
+
+        function openUserSession(session_id){
+
+            let session_tab_data_list = user_session_dict[session_id];
+
+            if (session_tab_data_list != undefined){
+
+                let session_tab_urls = [];
+                for (i = 0; i <= session_tab_data_list.length-1; i++){
+                    
+                    let d = session_tab_data_list[i];
+                    session_tab_urls.push(d['url']);
+
+                };
+
+                var data = { type: "open_session", data: session_tab_urls };
+                window.postMessage(data, "*");    
+
+            };
+
+        };
+
+        function deleteUserSession(session_id){
+
+            if (confirm('Are you sure you want to delete this saved session?')) {
+
+                $.ajax({
+                    type : 'POST',
+                    url : "{{ url_for('delete_session') }}",
+                    contentType: 'application/json;charset=UTF-8',
+                    data : JSON.stringify({
+                        'session_id': session_id
+                    }),
+                    success: function(res){
+                        window.location.reload();
+                    }
+                });
+
+            } 
+
+        };
+
+        function removeWindow(window_id){
+
+            var data = { type: "remove_window", window_id: window_id };
+            window.postMessage(data, "*");
+
+        };
+
+        function refreshSession(){
+
+            var data = { type: "refresh_session" };
+            window.postMessage(data, "*");
+
+        };
+
+
+        $('#create_session_button').click(function(){
+
+            $('.create_session_modal').modal('show');
+
+        });
+
+        $('.window_toggle').click(function(){
+
+            let parent_div = $(this).parent().parent().parent().parent();
+            parent_div.find(':checkbox').prop("checked", $(this).prop('checked'))
+
+        });
+
+
+        $('#create_session_form_button').click(function(){
+
+            let requested_tabs = $('input[type="checkbox"][name="cb_tab_url"]:checked');
+            let session_name = $('#session_name').val();
+
+            let requested_tab_data = [];
+            for (i = 0; i <= requested_tabs.length-1; i++){
+                // requested_tab_data.push(requested_tabs[i].value)
+                let current_tb_url = requested_tabs[i].value;
+                let current_tb_data = tab_dict[current_tb_url];
+                requested_tab_data.push(current_tb_data);
+            }
+
+            $.ajax({
+                type : 'POST',
+                url : "{{ url_for('create_session') }}",
+                contentType: 'application/json;charset=UTF-8',
+                data : JSON.stringify({
+                    'session_name': session_name,
+                    'requested_tabs': requested_tab_data
+                }),
+                success: function(res){
+                    window.location.reload();
+                }
+            });
+
+        });
+
+
+        function updateUserSession(session_id){
+
+            let session_tab_list = user_session_dict[session_id];
+
+            if (session_tab_list != undefined){
+
+                // var data = { type: "open_session", data: session_tab_url_list };
+                // window.postMessage(data, "*");
+
+                // let session_name = session_tab_info_list['name'];
+                // $('#update_session_modal')
+                // $('#update_form_session_name').val(session_name);
+                
+                // session_url_list
+                // primary_window_form_div
+
+                let existing_window_div = document.getElementsByClassName('primary_update_window_form_div');
+                if (existing_window_div.length == 1){
+                    existing_window_div[0].remove();
+                };
+
+                let initial_session_dict = session_tab_list[0];
+                let session_name = initial_session_dict['session_name'];
+
+                // $('#update_form_session_name').val(session_name);
+                document.getElementById("update_form_session_name").value = session_name;
+                
+                let update_form_elem = document.getElementById('update_modal_form');
+                let parent_div = document.createElement('div');
+                parent_div.className = 'primary_update_window_form_div';
+
+                // let header_elem = document.createElement('h4');
+                // header_elem.innerText = session_name;
+
+                // let span_elem = document.createElement('span');
+                // let select_all_div = document.createElement('div');
+                // select_all_div.className = 'ui slider checkbox';
+                // let cb_input = document.createElement('input');
+                // cb_input.setAttribute("type", "checkbox");
+                // cb_input.className = 'window_toggle';
+                // let cb_label = document.createElement('label');
+                // cb_label.innerText = 'Select All';
+
+                // select_all_div.appendChild(cb_input);
+                // select_all_div.appendChild(cb_label);
+                // span_elem.appendChild(select_all_div);
+                // header_elem.appendChild(span_elem);
+
+                // parent_div.appendChild(header_elem);
+
+                let list_div = document.createElement('div');
+                list_div.className = 'ui list';
+
+                for (i=0; i<=session_tab_list.length-1; i++){
+
+                    let session_dict = session_tab_list[i];
+                    let tab_id = session_dict['tab_id'];
+                    let tab_url_name = session_dict['name'];
+                    let tab_url = session_dict['url'];
+                    let tab_favicon_url = session_dict['favicon_url'];
+                    
+                    let cb_item_div = document.createElement('div');
+                    cb_item_div.className = 'ui checkbox item';
+                    let cb_input_url = document.createElement('input');
+                    cb_input_url.setAttribute("type", "checkbox");
+                    cb_input_url.name = 'existing_update_cb_tab';
+                    // cb_input_url.value = tab_url;
+                    cb_input_url.value = tab_id;
+                    cb_input_url.checked = true;
+                    
+                    let label_url_element = document.createElement('label');
+                    let href_url_element = document.createElement('a');
+                    href_url_element.href = tab_url;
+                    href_url_element.innerText = tab_url_name;
+                    href_url_element.setAttribute('target', '_blank');
+                    href_url_element.setAttribute('rel', 'noopener noreferrer');
+
+                    label_url_element.appendChild(href_url_element);
+                    cb_item_div.appendChild(cb_input_url);
+                    cb_item_div.appendChild(label_url_element);
+
+                    list_div.appendChild(cb_item_div);
+
+                };
+
+                // parent_div.appendChild(header_elem);
+                parent_div.appendChild(list_div);
+
+                let other_header_elem = document.createElement('h4');
+                other_header_elem.className = 'ui header';
+                other_header_elem.innerText = 'Current Tabs';
+                
+                let other_list_elem = document.createElement('div');
+                other_list_elem.className = 'ui list';
+
+                for (tmp_url in tab_dict){
+
+                    let tb_url_dict = tab_dict[tmp_url];
+                    // 'url': tb_url, 'title': tb_title, 'favicon_url': tb_favicon_url}
+                    // tb_url_dict
+
+                    let cb_item_div = document.createElement('div');
+                    cb_item_div.className = 'ui checkbox item';
+                    let cb_input_url = document.createElement('input');
+                    cb_input_url.setAttribute("type", "checkbox");
+                    cb_input_url.name = 'new_update_cb_tab';
+                    cb_input_url.value = tmp_url;
+                    cb_input_url.checked = false;
+
+                    let label_url_element = document.createElement('label');
+                    let href_url_element = document.createElement('a');
+                    href_url_element.href = tmp_url;
+                    href_url_element.innerText = tb_url_dict['title'];
+                    href_url_element.setAttribute('target', '_blank');
+                    href_url_element.setAttribute('rel', 'noopener noreferrer');
+                    
+                    // other_list_elem.appendChild(cb_item_div);
+
+                    label_url_element.appendChild(href_url_element);
+                    cb_item_div.appendChild(cb_input_url);
+                    cb_item_div.appendChild(label_url_element);
+
+                    other_list_elem.appendChild(cb_item_div);
+
+                }
+
+                var hidden_input = document.createElement("input");
+                hidden_input.setAttribute("type", "hidden");
+                hidden_input.name = 'hidden_update_session_id_value';
+                hidden_input.id = 'hidden_input_session_id_val';
+                hidden_input.value = session_id;
+
+                parent_div.appendChild(other_header_elem);
+                parent_div.appendChild(other_list_elem);
+                
+                parent_div.appendChild(hidden_input);
+                
+                update_form_elem.appendChild(parent_div);
+
+                $('.update_session_modal').modal('show');
+
+            }
+
+        };
+
+
+        $('#update_session_form_button').click(function(){
+
+            let session_name = $('#update_form_session_name').val();
+
+            let existing_requested_tabs = $('#update_modal_form input[type="checkbox"][name="existing_update_cb_tab"]:checked');
+            let new_requested_tabs = $('#update_modal_form input[type="checkbox"][name="new_update_cb_tab"]:checked');
+
+            
+            let existing_request_tab_data = [];
+            for (i = 0; i <= existing_requested_tabs.length-1; i++){            
+                let existing_tb_value = existing_requested_tabs[i].value;
+                existing_request_tab_data.push(existing_tb_value);
+            };
+
+            let new_request_tab_data = [];
+            for (i = 0; i <= new_requested_tabs.length-1; i++){
+                let new_tb_value = new_requested_tabs[i].value;
+                let tmp_tb_dict = tab_dict[new_tb_value];
+                new_request_tab_data.push(tmp_tb_dict);
+            };
+
+            let current_session_id = $('#hidden_input_session_id_val').val();
+
+            $.ajax({
+                type : 'POST',
+                url : "{{ url_for('update_session') }}",
+                contentType: 'application/json;charset=UTF-8',
+                data : JSON.stringify({
+                    'session_id': current_session_id,
+                    'session_name': session_name,
+                    'new_tab_data': new_request_tab_data,
+                    'existing_tab_data': existing_request_tab_data
+                }),
+                success: function(res){
+                    window.location.reload();
+                }
+            });
+
+        });        
+
+
+    </script>
+
+{% endblock %}
 

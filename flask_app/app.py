@@ -60,7 +60,6 @@ def home():
         final_window_id_list.append(f"window_{ wdi['id'] }")
         c += 1
 
-
     # Fetching saved user sessions
     sql = 'select * from saved_session order by created_timestamp desc'
     cur.execute(sql)
@@ -89,89 +88,17 @@ def home():
         'final_sessions_list': final_sessions_list
     }
 
-    print('final_sessions_list', final_sessions_list)
-
     if request.method == 'POST':
         pass
 
     return render_template(
-        # 'new_home_one.html',
-        'new_home_two.html',
+        'home.html',
         value = rv
     )
-
-    # sql = 'select * from browser_window where focused = true'
-    # cur.execute(sql)
-
-    # active_window = cur.fetchone()  # assuming only one
-
-    # sql = 'select * from browser_tab where window_object_id = %s'
-    # cur.execute(sql, (active_window['id'],))
-    # active_window_tabs = cur.fetchall()
-
-    # sql = 'select * from browser_window where focused = false'
-    # cur.execute(sql)    
-    # non_active_windows = cur.fetchall()
-
-    # non_active_window_tab_list = []
-    # for n_act_wd in non_active_windows:
-    #     sql = 'select * from browser_tab where window_object_id = %s'
-    #     cur.execute(sql, (n_act_wd['id'],))
-    #     c_wd_tabs = cur.fetchall()
-    #     non_active_window_tab_list.append({
-    #         'window_dict': n_act_wd,
-    #         'tabs': c_wd_tabs
-    #     })
-
-    # rv = {
-    #     'active_window': active_window,
-    #     'active_window_tabs': active_window_tabs,
-    #     'non_active_windows': non_active_window_tab_list
-    # }
-
-    # return render_template(
-    #     'new_home_one.html',
-    #     value = rv
-    # )
-
-
-# @app.route('/sessions', methods=['GET', 'POST'])
-# def saved_sessions():
-#     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
-
-#     sql = 'select * from saved_session order by created_timestamp desc'
-#     cur.execute(sql)
-#     user_sessions = cur.fetchall()
-
-#     c = 1
-#     final_sessions_list = []
-#     final_sessions_id_list = []
-#     for sdict in user_sessions:
-#         sql = 'select * from saved_session_url where session_object_id = %s'
-#         cur.execute(sql, (sdict['id'],))
-#         session_tab_urls = cur.fetchall()
-#         final_sessions_list.append({
-#             'session_object_id': sdict['id'],
-#             'current_count': c,
-#             'session': sdict,
-#             'tabs': session_tab_urls    
-#         })
-#         final_sessions_id_list.append(f"session_{sdict['id']}")
-#         c += 1
-
-#     rv = {
-#         'final_sessions_id_list': final_sessions_id_list,
-#         'final_sessions_list': final_sessions_list
-#     }
-
-#     return render_template('saved_sessions.html', value = rv)
-
-
 
 
 @app.route('/refresh_windows', methods=['POST'])
 def refresh_window():
-    print('json-data:', request.get_json())
 
     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
@@ -219,11 +146,8 @@ def refresh_window():
     return {'success': True}
 
 
-
 @app.route('/create_session', methods=['POST'])
 def create_session():
-    print('post-data:', request.json)
-
     session_name = request.json['session_name']
     requested_tab_data = request.json['requested_tabs']
     
@@ -234,8 +158,6 @@ def create_session():
     g.db.commit()
     
     saved_session_object_id = cur.fetchone()['id']
-
-    # print('new-session-obj:', saved_session_object_id)
 
     for tb_dict in requested_tab_data:
         tb_url = tb_dict['url']
@@ -251,7 +173,6 @@ def create_session():
 
 @app.route('/update_session', methods=['POST'])
 def update_session():
-    print('post-data:', request.json)
 
     # # TODO: pass session id
     session_id = request.json['session_id']
@@ -271,8 +192,6 @@ def update_session():
     session_tab_urls = cur.fetchall()
 
     existing_session_tab_id_list = [d['id'] for d in session_tab_urls]
-    print('exisiting-tab-id-list:', existing_session_tab_id_list)
-    print('new-tab-id-list:', existing_tab_data)
     for tid in existing_session_tab_id_list:
         if tid not in existing_tab_data:
             sql = 'delete from saved_session_url where id = %s'
@@ -293,7 +212,6 @@ def update_session():
 
 @app.route('/delete_session', methods=['POST'])
 def delete_session():
-    print('post-data:', request.json)
 
     session_id = request.json['session_id']
     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
@@ -317,4 +235,3 @@ if __name__ == "__main__":
 # export FLASK_APP=app.py
 # export FLASK_ENV=development
 # flask run --host 0.0.0.0 --port 5000
-

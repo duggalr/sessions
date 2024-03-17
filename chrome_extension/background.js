@@ -93,42 +93,7 @@ function tmpOne(){
 
             });
 
-            // var finalData = [];
-            // for (i=0; i <= all_windows_res.length-1; i++){
-
-            //     let window_di = all_windows_res[i];
-            //     getTabData(window_di).then(function(tabDataRes){
-            //         finalData.push(tabDataRes);
-            //     });
-
-            // };
-
-            // resolve(finalData);
-    
-            // for (i=0; i <= all_windows_res.length-1; i++){
-            //     // console.log('window-dict:', all_windows_res[i])
-            //     // finalData.push(getTabData(all_windows_res[i]))
-            //     finalData.push({
-            //         'window_data': all_windows_res[i],
-            //         'tab_info': getTabData(all_windows_res[i])
-            //     });
-            // };
-    
-            // Promise.all(finalData).then(function(values) {
-    
-            //     let response = Request(url=REFRESH_WINDOW_API_URL, data=values)
-            //     response.then(function(res){
-            //         console.log('window-refresh-response:', res)
-            //         // chrome.tabs.update({  // redirect to flask-app once complete
-            //         //     url: 'http://127.0.0.1:5000'
-            //         // });
-            //     });
-    
-            // });
-    
         });
-
-        // resolve(finalData);
 
     });
 
@@ -143,34 +108,6 @@ function sendAllWindows(){
 
     })
 
-    // chrome.windows.getAll(function(all_windows_res){
-    //     var finalData = []
-
-
-
-    //     // for (i=0; i <= all_windows_res.length-1; i++){
-    //     //     // console.log('window-dict:', all_windows_res[i])
-    //     //     // finalData.push(getTabData(all_windows_res[i]))
-    //     //     finalData.push({
-    //     //         'window_data': all_windows_res[i],
-    //     //         'tab_info': getTabData(all_windows_res[i])
-    //     //     });
-    //     // };
-
-    //     // Promise.all(finalData).then(function(values) {
-
-    //     //     let response = Request(url=REFRESH_WINDOW_API_URL, data=values)
-    //     //     response.then(function(res){
-    //     //         console.log('window-refresh-response:', res)
-    //     //         // chrome.tabs.update({  // redirect to flask-app once complete
-    //     //         //     url: 'http://127.0.0.1:5000'
-    //     //         // });
-    //     //     });
-
-    //     // });
-
-    // })
-  
 }
 
 
@@ -201,14 +138,7 @@ chrome.runtime.onMessage.addListener(
             })
 
         }
-        // else if (request['type'] == 'open_window'){
-            
-        //     chrome.windows.update(windowId, { focused: true }, function(updatedWindow) {
-        //         console.log("Window with ID " + windowId + " is now focused.");
-        //     });
 
-        // }
-        
         else if (request['type'] == 'remove_window'){
 
             console.log('request-message:', request)
@@ -216,9 +146,7 @@ chrome.runtime.onMessage.addListener(
             chrome.windows.remove(parseInt(request['data']['window_id']), function() {
                 
                 setTimeout(function() { sendAllWindows() }, 100);
-                
-                // sendResponse({success: true});
-                // console.log("Window with ID " + windowId + " has been closed.");
+
             });
 
         }
@@ -235,4 +163,3 @@ chrome.runtime.onMessage.addListener(
     }
 
 );
-
