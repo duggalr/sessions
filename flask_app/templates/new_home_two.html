@@ -41,11 +41,15 @@
                             {{ wdi['window_title'] }}
                             &nbsp;
 
-                            <span id="window_right_arrow_span">
-                                <i class="arrow left icon window_left_arrow"></i>
-                                <i class="arrow right icon window_right_arrow"></i>
-                                <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span>
-                            </span>
+                            {% if value['final_window_tab_list']|length > 0 %}
+
+                                <span id="window_right_arrsow_span">
+                                    <i class="arrow left icon window_left_arrow"></i>
+                                    <i class="arrow right icon window_right_arrow"></i>
+                                    <!-- <span style="color: gray; font-size: 13px;">({{ wdi['current_count'] }} / {{ value['final_window_tab_list']|length }})</span> -->
+                                </span>
+
+                            {% endif %}
                             
                             <!-- <div style="float: right;">
                                 <button class="ui medium black button" id="open_session" onclick="">Open</button>
@@ -125,9 +129,11 @@
                         <div class="ui header primary-card-button-div">
 
                             <div>
-                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="deleteUserSession(this.id)"><i class="close icon"></i>Delete Session</button>
+                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="deleteUserSession(this.id)"><i class="trash alternate icon"></i>Delete Session</button>
                                 &nbsp;
-                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="openUserSession(this.id)"><i class="sync icon"></i>Open Session</button>
+                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="openUserSession(this.id)"><i class="eye icon"></i>Open Session</button>
+                                &nbsp;
+                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="updateUserSession(this.id)"><i class="edit icon"></i>Update Session</button>
                             </div>
     
                         </div>
@@ -137,12 +143,16 @@
                             {{ session_dict['session']['session_name'] }}
                             &nbsp;
 
-                            <span id="window_right_arrow_span">
-                                <i class="arrow left icon session_left_arrow"></i>
-                                <!-- &nbsp; -->
-                                <i class="arrow right icon session_right_arrow"></i>
-                                <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span>
-                            </span>
+                            {% if value['final_sessions_list']|length > 0 %}
+
+                                <span id="window_right_arrow_span">
+                                    <i class="arrow left icon session_left_arrow"></i>
+                                    <!-- &nbsp; -->
+                                    <i class="arrow right icon session_right_arrow"></i>
+                                    <!-- <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span> -->
+                                </span>
+
+                            {% endif %}
                             
                             <!-- <div style="float: right;">
                                 <button class="ui medium black button" id="open_session" onclick="">Open</button>
@@ -210,48 +220,110 @@
         <div class="header">Create new session</div>
         <div class="content">
         
-            <!-- <form class="ui form" > -->
-            <div class="field" style="width: 40%;">
-                <label>Session Name</label>
-                <input type="text" id="session_name" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
-            </div>
+            <form class="ui form" >
 
-            <br/>
-            {% for wdi in value['final_window_tab_list'] %}
+                <div class="field" style="width: 40%;">
+                    <label>Session Name</label>
+                    <input type="text" id="session_name" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
+                </div>
 
-                <div class="primary_window_form_div">
+                <br/>
+                {% for wdi in value['final_window_tab_list'] %}
 
-                    <h4>
-                        {{ wdi['window_title'] }}
-                        &nbsp;
-                        <span>
-                            <div class="ui slider checkbox">
-                                <input type="checkbox" class="window_toggle">
-                                <label>Select All</label>
-                            </div>
-                        </span>
-                    </h4>
-    
-                    <div class="ui list">
-                    {% for tdi in wdi['tabs'] %}
-    
-                        <div class="ui checkbox item">
-                            <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
-                            <label>
-                                <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
-                                    {{ tdi['title'] }}
-                                </a>
-                            </label>
+                    <div class="primary_window_form_div">
+
+                        <h4>
+                            {{ wdi['window_title'] }}
+                            &nbsp;
+                            <span>
+                                <div class="ui slider checkbox">
+                                    <input type="checkbox" class="window_toggle">
+                                    <label>Select All</label>
+                                </div>
+                            </span>
+                        </h4>
+        
+                        <div class="ui list">
+                            {% for tdi in wdi['tabs'] %}
+            
+                                <div class="ui checkbox item">
+                                    <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
+                                    <label>
+                                        <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                            {{ tdi['title'] }}
+                                        </a>
+                                    </label>
+                                </div>
+            
+                            {% endfor %}
                         </div>
-    
-                    {% endfor %}
-                    </div>
 
+                    </div>
+                    <br/>
+
+                {% endfor %}
+
+            </form>
+
+        </div>
+        <div class="actions">
+            <div id="create_session_form_button" class="ui black approve button">Submit</div>
+            <div class="ui cancel button">Cancel</div>
+        </div>
+    </div>
+
+
+    <!-- Update Session Modal -->
+    <div class="ui small modal update_session_modal">
+        <div class="header">Update Session</div>
+        <div class="content">
+        
+            <form class="ui form" >
+
+                <div class="field" style="width: 40%;">
+                    <label>Session Name</label>
+                    <input type="text" id="update_form_session_name" name="session-name" placeholder="name your session..." style="margin-top: 5px;">
                 </div>
                 <br/>
 
-            {% endfor %}
-            <!-- </form> -->
+                <div id="session_url_list"></div>
+
+                <!-- {% for wdi in value['final_window_tab_list'] %}
+
+                    <div class="primary_window_form_div">
+
+                        <h4>
+                            {{ wdi['window_title'] }}
+                            &nbsp;
+                            <span>
+                                <div class="ui slider checkbox">
+                                    <input type="checkbox" class="window_toggle">
+                                    <label>Select All</label>
+                                </div>
+                            </span>
+                        </h4>
+        
+                        <div class="ui list">
+                            {% for tdi in wdi['tabs'] %}
+            
+                                <div class="ui checkbox item">
+                                    <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
+                                    <label>
+                                        <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                            {{ tdi['title'] }}
+                                        </a>
+                                    </label>
+                                </div>
+            
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                    <br/>
+
+                {% endfor %} -->
+
+            </form>
 
         </div>
         <div class="actions">
@@ -294,15 +366,24 @@
         let user_session_dict = {};
         for (i=0; i<=final_sessions_list.length-1; i++){
             let sdict = final_sessions_list[i];
+            console.log('session-sdict', sdict['session'])
             let session_obj_id = sdict['session_object_id'];
             let session_tabs = sdict['tabs'];
-            let session_urls = [];
+            // let session_urls = [];
+            let session_info_list = [];
             for (y=0; y<=session_tabs.length-1; y++){
                 let s_tb_list = session_tabs[y];
-                let s_url = s_tb_list[2];
-                session_urls.push(s_url);
+                console.log(s_tb_list)
+                session_info_list.push({
+                    'sesssion_name': sdict['session'],
+                    'name': s_tb_list[1],
+                    'url': s_tb_list[2],
+                    'favicon_url': s_tb_list[3]
+                })
+                // let s_url = s_tb_list[2];
+                // session_urls.push(s_url);
             };
-            user_session_dict[session_obj_id] = session_urls;
+            user_session_dict[session_obj_id] = session_info_list;
         };
 
 
@@ -395,17 +476,20 @@
 
         };
 
+
         if (showSession === true){
         
             url_param_value = url.searchParams.get("s");
             updateView(showSession, url_param_value);
 
-        } else {
+        } 
+        else {
 
             url_param_value = url.searchParams.get("c");
             updateView(showSession, url_param_value);
 
         };
+
 
         $('#saved_session_item').click(function(){
 
@@ -433,7 +517,6 @@
 
         });
         
-
         // $('#create_session_button').click(function(){
 
         //     $('.create_session_modal').modal('show');
@@ -529,9 +612,136 @@
         };
 
 
+        $('#create_session_button').click(function(){
+
+            $('.create_session_modal').modal('show');
+
+        });
+
+        $('.window_toggle').click(function(){
+
+            let parent_div = $(this).parent().parent().parent().parent();
+            parent_div.find(':checkbox').prop("checked", $(this).prop('checked'))
+
+        });
+
+        $('#create_session_form_button').click(function(){
+
+            let requested_tabs = $('input[type="checkbox"][name="cb_tab_url"]:checked');
+            let session_name = $('#session_name').val();
+
+            let requested_tab_data = [];
+            for (i = 0; i <= requested_tabs.length-1; i++){
+                // requested_tab_data.push(requested_tabs[i].value)
+                let current_tb_url = requested_tabs[i].value;
+                let current_tb_data = tab_dict[current_tb_url];
+                requested_tab_data.push(current_tb_data);
+            }
+
+            $.ajax({
+                type : 'POST',
+                url : "{{ url_for('create_session') }}",
+                contentType: 'application/json;charset=UTF-8',
+                data : JSON.stringify({
+                    'session_name': session_name,
+                    'requested_tabs': requested_tab_data
+                }),
+                success: function(res){
+                    // TODO: redirect to saved sessions page
+                }
+            });
+
+        });
 
 
-        
+        // TODO: add update session
+        function updateUserSession(session_id){
+
+            console.log('session-id:', session_id)
+            let session_tab_list = user_session_dict[session_id];
+
+            if (session_tab_list != undefined){
+
+                // var data = { type: "open_session", data: session_tab_url_list };
+                // window.postMessage(data, "*");
+
+                // let session_name = session_tab_info_list['name'];
+                // $('#update_session_modal')
+                // $('#update_form_session_name').val(session_name);
+                
+                session_url_list
+                primary_window_form_div
+                for (i=0; i<=session_tab_list.length-1; i++){
+
+                    // let cr_url = session_url_list[i];
+                    let session_dict = session_tab_list[i];
+                    let session_name = session_dict['session_name'];
+                    let tab_url_name = session_dict['name'];
+                    let tab_url = session_dict['url'];
+                    let tab_favicon_url = session_dict['favicon_url'];
+
+                    // TODO: create and go from there
+                    let parent_div = document.createElement('div');
+                    parent_div.className = 'primary_window_form_div';
+
+                    let header_elem = document.createElement('h4');
+                    // header_elem.innerText = 
+                    header_elem.innerText = session_name;
+
+                    let span_elem = document.createElement('span');
+                    let select_all_div = document.createElement('div');
+                    select_all_div.className = 'ui slider checkbox';
+                    let cb_input = document.createElement('input');
+                    cb_input.setAttribute("type", "checkbox");
+                    cb_input.className = 'window_toggle';
+                    let cb_label = document.createElement('label');
+                    cb_label.innerText = 'Select All';
+
+                }
+
+                // TODO: update the code for open-sessions as above session_tab_url_list logic changed
+
+            }
+
+        }
+
+
+//         {% for wdi in value['final_window_tab_list'] %}
+
+// <div class="primary_window_form_div">
+
+//     <h4>
+//         {{ wdi['window_title'] }}
+//         &nbsp;
+//         <span>
+//             <div class="ui slider checkbox">
+//                 <input type="checkbox" class="window_toggle">
+//                 <label>Select All</label>
+//             </div>
+//         </span>
+//     </h4>
+
+//     <div class="ui list">
+//         {% for tdi in wdi['tabs'] %}
+
+//             <div class="ui checkbox item">
+//                 <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
+//                 <label>
+//                     <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+//                         {{ tdi['title'] }}
+//                     </a>
+//                 </label>
+//             </div>
+
+//         {% endfor %}
+//     </div>
+
+// </div>
+// <br/>
+
+// {% endfor %}
+
+
     </script>
 
 {% endblock %}

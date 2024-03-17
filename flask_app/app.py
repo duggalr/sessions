@@ -252,6 +252,11 @@ def delete_session():
 
     session_id = request.json['session_id']
     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    
+    sql = 'DELETE FROM saved_session_url where session_object_id = %s'
+    cur.execute(sql, (session_id,))
+    g.db.commit()
+    
     sql = 'DELETE FROM saved_session where id = %s'
     cur.execute(sql, (session_id,))
     g.db.commit()
