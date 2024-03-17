@@ -89,6 +89,8 @@ def home():
         'final_sessions_list': final_sessions_list
     }
 
+    print('final_sessions_list', final_sessions_list)
+
     if request.method == 'POST':
         pass
 
@@ -133,36 +135,36 @@ def home():
     # )
 
 
-@app.route('/sessions', methods=['GET', 'POST'])
-def saved_sessions():
-    cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+# @app.route('/sessions', methods=['GET', 'POST'])
+# def saved_sessions():
+#     cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
-    sql = 'select * from saved_session order by created_timestamp desc'
-    cur.execute(sql)
-    user_sessions = cur.fetchall()
+#     sql = 'select * from saved_session order by created_timestamp desc'
+#     cur.execute(sql)
+#     user_sessions = cur.fetchall()
 
-    c = 1
-    final_sessions_list = []
-    final_sessions_id_list = []
-    for sdict in user_sessions:
-        sql = 'select * from saved_session_url where session_object_id = %s'
-        cur.execute(sql, (sdict['id'],))
-        session_tab_urls = cur.fetchall()
-        final_sessions_list.append({
-            'session_object_id': sdict['id'],
-            'current_count': c,
-            'session': sdict,
-            'tabs': session_tab_urls    
-        })
-        final_sessions_id_list.append(f"session_{sdict['id']}")
-        c += 1
+#     c = 1
+#     final_sessions_list = []
+#     final_sessions_id_list = []
+#     for sdict in user_sessions:
+#         sql = 'select * from saved_session_url where session_object_id = %s'
+#         cur.execute(sql, (sdict['id'],))
+#         session_tab_urls = cur.fetchall()
+#         final_sessions_list.append({
+#             'session_object_id': sdict['id'],
+#             'current_count': c,
+#             'session': sdict,
+#             'tabs': session_tab_urls    
+#         })
+#         final_sessions_id_list.append(f"session_{sdict['id']}")
+#         c += 1
 
-    rv = {
-        'final_sessions_id_list': final_sessions_id_list,
-        'final_sessions_list': final_sessions_list
-    }
+#     rv = {
+#         'final_sessions_id_list': final_sessions_id_list,
+#         'final_sessions_list': final_sessions_list
+#     }
 
-    return render_template('saved_sessions.html', value = rv)
+#     return render_template('saved_sessions.html', value = rv)
 
 
 
@@ -232,6 +234,8 @@ def create_session():
     g.db.commit()
     
     saved_session_object_id = cur.fetchone()['id']
+
+    # print('new-session-obj:', saved_session_object_id)
 
     for tb_dict in requested_tab_data:
         tb_url = tb_dict['url']

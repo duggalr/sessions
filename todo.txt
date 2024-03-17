@@ -9,3 +9,7 @@ add favicon
 
 <!-- TODO: complete saved sessions UI + CRUD on saved sessions  -->
 
+// TODO: 
+                    // update the code for open-sessions as above session_tab_url_list logic changed
+                    // svg-waves 
+                    // proceed to key before gym

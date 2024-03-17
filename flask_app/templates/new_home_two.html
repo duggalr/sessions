@@ -119,93 +119,106 @@
             </div>
 
             <!-- Saved Sessions -->
-            <div class="saved_sessions_parent_div" style="display: none;">
 
-                {% for session_dict in value['final_sessions_list'] %}
+            {% if value['final_sessions_list']|length > 0 %}
 
-                    <div id="session_{{ session_dict['session_object_id'] }}" style="display: none;">
+                <div class="saved_sessions_parent_div" style="display: none;">
 
+                    {% for session_dict in value['final_sessions_list'] %}
 
-                        <div class="ui header primary-card-button-div">
+                        <div id="session_{{ session_dict['session_object_id'] }}" style="display: none;">
 
-                            <div>
-                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="deleteUserSession(this.id)"><i class="trash alternate icon"></i>Delete Session</button>
-                                &nbsp;
-                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="openUserSession(this.id)"><i class="eye icon"></i>Open Session</button>
-                                &nbsp;
-                                <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="updateUserSession(this.id)"><i class="edit icon"></i>Update Session</button>
+                            <div class="ui header primary-card-button-div">
+
+                                <div>
+                                    <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="deleteUserSession(this.id)"><i class="trash alternate icon"></i>Delete Session</button>
+                                    &nbsp;
+                                    <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="openUserSession(this.id)"><i class="eye icon"></i>Open Session</button>
+                                    &nbsp;
+                                    <button class="ui small button" id="{{ session_dict['session']['id'] }}" onclick="updateUserSession(this.id)"><i class="edit icon"></i>Update Session</button>
+                                </div>
+        
                             </div>
-    
-                        </div>
 
 
-                        <div class="ui header session-header">
-                            {{ session_dict['session']['session_name'] }}
-                            &nbsp;
-
-                            {% if value['final_sessions_list']|length > 0 %}
-
-                                <span id="window_right_arrow_span">
-                                    <i class="arrow left icon session_left_arrow"></i>
-                                    <!-- &nbsp; -->
-                                    <i class="arrow right icon session_right_arrow"></i>
-                                    <!-- <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span> -->
-                                </span>
-
-                            {% endif %}
-                            
-                            <!-- <div style="float: right;">
-                                <button class="ui medium black button" id="open_session" onclick="">Open</button>
+                            <div class="ui header session-header">
+                                {{ session_dict['session']['session_name'] }}
                                 &nbsp;
-                                <button class="ui medium button" onclick="">Update</button>
-                                &nbsp;
-                                <button class="ui medium button" onclick="">Delete</button>
-                            </div> -->
 
-                        </div>
+                                {% if value['final_sessions_list']|length > 0 %}
 
-                        <span class="session-header-date">Created: {{ session_dict['session']['created_timestamp'].strftime('%Y-%m-%d') }}</span>
+                                    <span id="window_right_arrow_span">
+                                        <i class="arrow left icon session_left_arrow"></i>
+                                        <!-- &nbsp; -->
+                                        <i class="arrow right icon session_right_arrow"></i>
+                                        <!-- <span style="color: gray; font-size: 13px;">({{ session_dict['current_count'] }} / {{ value['final_sessions_list']|length }})</span> -->
+                                    </span>
 
-                        <div class="ui card" style="width: 100%; margin-top: 3.5%;">
+                                {% endif %}
+                                
+                                <!-- <div style="float: right;">
+                                    <button class="ui medium black button" id="open_session" onclick="">Open</button>
+                                    &nbsp;
+                                    <button class="ui medium button" onclick="">Update</button>
+                                    &nbsp;
+                                    <button class="ui medium button" onclick="">Delete</button>
+                                </div> -->
+
+                            </div>
+
+                            <span class="session-header-date">Created: {{ session_dict['session']['created_timestamp'].strftime('%Y-%m-%d') }}</span>
+
+                            <div class="ui card" style="width: 100%; margin-top: 3.5%;">
+                    
+                                <div class="content">
+                                    <h2 class="ui sub header" style="font-size: 16px;">
+                                        Tabs ({{ session_dict['tabs']|length }})
+                                    </h2>
+                                </div>
                 
-                            <div class="content">
-                                <h2 class="ui sub header" style="font-size: 16px;">
-                                    Tabs ({{ session_dict['tabs']|length }})
-                                </h2>
-                            </div>
-            
-                            <div class="content">
-            
-                                <div class="ui small feed" >
+                                <div class="content">
+                
+                                    <div class="ui small feed" >
 
-                                    {% for tdi in session_dict['tabs'] %}
-            
-                                        <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
-                                            <div class="content">
-                                                <div class="summary">
-                                                    <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
-                                                    <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
-                                                        {{ tdi['title'] }}
-                                                    </a>
+                                        {% for tdi in session_dict['tabs'] %}
+                
+                                            <div class="event" style="padding-top: 8px; padding-bottom: 8px;">
+                                                <div class="content">
+                                                    <div class="summary">
+                                                        <img src="{{ tdi['favicon_url'] }}" style="width: 15px; height: 15px; margin-right: 5px;">
+                                                        <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
+                                                            {{ tdi['title'] }}
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-            
-                                        <div style="border-bottom: 0.5px solid lightgrey;"></div>
-            
-                                    {% endfor %}
-            
+                
+                                            <div style="border-bottom: 0.5px solid lightgrey;"></div>
+                
+                                        {% endfor %}
+                
+                                    </div>
+                
                                 </div>
-            
+                
                             </div>
-            
+
                         </div>
 
+                    {% endfor %}
+
+                </div>
+            
+            {% else %}
+
+                <div class="ui placeholder segment placeholder_saved_sessions_parent_div" style="display: none;">
+                    <div class="ui icon header">
+                        <i class="folder open icon" style="padding-bottom: 5px;"></i>
+                        No Saved Sessions.
                     </div>
+                </div>
 
-                {% endfor %}
-
-            </div>
+            {% endif %}
 
 
         </div>
@@ -213,6 +226,8 @@
         <div class="three wide column"></div>
 
     </div>
+
+
 
 
     <!-- Create Session Modal -->
@@ -348,7 +363,9 @@
         let final_window_id_list = {{ value['final_window_id_list']|safe }};
         let final_window_tab_list = {{ value['final_window_tab_list']|tojson }};
 
-        
+
+        console.log(final_sessions_list, final_sessions_list.length)
+     
         let tab_dict = {};
         for (i=0; i<=final_window_tab_list.length-1; i++){
             let wdict = final_window_tab_list[i];
@@ -393,6 +410,8 @@
 
             // console.log(showSession, val)
 
+            $('.placeholder_saved_sessions_parent_div').hide();
+
             if (val == null){
 
                 // val = 0;
@@ -434,6 +453,8 @@
 
                     } else {
 
+                        // console.log(final_sessions_id_list, val)
+
                         for (i=0; i<=final_sessions_id_list.length-1; i++){
                             $('#' + final_sessions_id_list[i]).hide();
                         };
@@ -441,6 +462,7 @@
                         val = 0;
                         url_param_value = val;
                         current_session_id = final_sessions_id_list[val];
+                        // console.log('c-session-id:', current_session_id)
                         $('#' + current_session_id).show();
 
                     }
@@ -480,7 +502,7 @@
 
 
         if (showSession === true){
-        
+
             url_param_value = url.searchParams.get("s");
             updateView(showSession, url_param_value);
 
@@ -491,7 +513,7 @@
             updateView(showSession, url_param_value);
 
         };
-
+        
 
         $('#saved_session_item').click(function(){
 
@@ -502,7 +524,17 @@
             $('#saved_session_item').addClass('active');
 
             showSession = true;
-            updateView(showSession, 0);
+            
+            if (final_sessions_list.length == 0){
+
+                $('.placeholder_saved_sessions_parent_div').show();
+
+            } else {
+
+                updateView(showSession, 0);
+
+            }
+
 
         });
 
@@ -519,11 +551,6 @@
 
         });
         
-        // $('#create_session_button').click(function(){
-
-        //     $('.create_session_modal').modal('show');
-
-        // });
 
         $('.window_left_arrow').click(function(){
 
@@ -564,15 +591,27 @@
 
         function openUserSession(session_id){
 
-            console.log('session-id:', session_id)
-            let session_tab_url_list = user_session_dict[session_id];
+            // console.log('session-id:', session_id)
+            let session_tab_data_list = user_session_dict[session_id];
 
-            if (session_tab_url_list != undefined){
+            if (session_tab_data_list != undefined){
 
-                var data = { type: "open_session", data: session_tab_url_list };
+                let session_tab_urls = [];
+                for (i = 0; i <= session_tab_data_list.length-1; i++){
+                    
+                    let d = session_tab_data_list[i];
+                    session_tab_urls.push(d['url']);
+
+                };
+
+                var data = { type: "open_session", data: session_tab_urls };
                 window.postMessage(data, "*");    
 
-            }
+            };
+            
+            // console.log('session-tab-url', session_tab_url_list)
+            // if (session_tab_url_list != undefined){
+            // }
 
         };
 
@@ -650,17 +689,16 @@
                     'requested_tabs': requested_tab_data
                 }),
                 success: function(res){
-                    // TODO: redirect to saved sessions page
+                    window.location.reload();
                 }
             });
 
         });
 
 
-        // TODO: add update session
         function updateUserSession(session_id){
 
-            console.log('session-id:', session_id)
+            // console.log('session-id:', session_id)
             let session_tab_list = user_session_dict[session_id];
 
             if (session_tab_list != undefined){
@@ -676,14 +714,14 @@
                 // primary_window_form_div
 
                 let existing_window_div = document.getElementsByClassName('primary_update_window_form_div');
-                console.log('primary-update-window:', existing_window_div)
+                // console.log('primary-update-window:', existing_window_div)
                 if (existing_window_div.length == 1){
                     existing_window_div[0].remove();
                 };
 
                 let initial_session_dict = session_tab_list[0];
                 let session_name = initial_session_dict['session_name'];
-                console.log('initial_session_dict', initial_session_dict);
+                // console.log('initial_session_dict', initial_session_dict);
 
                 // $('#update_form_session_name').val(session_name);
                 document.getElementById("update_form_session_name").value = session_name;
@@ -797,12 +835,8 @@
                 parent_div.appendChild(other_list_elem);
                 
                 parent_div.appendChild(hidden_input);
-
+                
                 update_form_elem.appendChild(parent_div);
-
-                // TODO: 
-                    // add crud for all
-                    // update the code for open-sessions as above session_tab_url_list logic changed
 
                 $('.update_session_modal').modal('show');
 
@@ -818,20 +852,16 @@
             let existing_requested_tabs = $('#update_modal_form input[type="checkbox"][name="existing_update_cb_tab"]:checked');
             let new_requested_tabs = $('#update_modal_form input[type="checkbox"][name="new_update_cb_tab"]:checked');
 
-            console.log('existing:', existing_requested_tabs);
-            // console.log('new:', new_requested_tabs)
+            // console.log('existing:', existing_requested_tabs);
             
             let existing_request_tab_data = [];
-            for (i = 0; i <= existing_requested_tabs.length-1; i++){
-                // requested_tab_data.push(requested_tabs[i].value)
+            for (i = 0; i <= existing_requested_tabs.length-1; i++){            
                 let existing_tb_value = existing_requested_tabs[i].value;
                 existing_request_tab_data.push(existing_tb_value);
             };
 
             let new_request_tab_data = [];
             for (i = 0; i <= new_requested_tabs.length-1; i++){
-                // requested_tab_data.push(requested_tabs[i].value)
-
                 let new_tb_value = new_requested_tabs[i].value;
                 let tmp_tb_dict = tab_dict[new_tb_value];
                 new_request_tab_data.push(tmp_tb_dict);
@@ -840,7 +870,7 @@
             console.log('tb-data:', existing_request_tab_data, new_request_tab_data)
 
             let current_session_id = $('#hidden_input_session_id_val').val();
-            console.log('current-session-id:', current_session_id);
+            // console.log('current-session-id:', current_session_id);
 
             $.ajax({
                 type : 'POST',
@@ -853,48 +883,12 @@
                     'existing_tab_data': existing_request_tab_data
                 }),
                 success: function(res){
-                    // TODO: redirect to saved sessions page
+                    window.location.reload();
                 }
             });
 
-        })
-        
+        });        
 
-
-//         {% for wdi in value['final_window_tab_list'] %}
-
-// <div class="primary_window_form_div">
-
-//     <h4>
-//         {{ wdi['window_title'] }}
-//         &nbsp;
-//         <span>
-//             <div class="ui slider checkbox">
-//                 <input type="checkbox" class="window_toggle">
-//                 <label>Select All</label>
-//             </div>
-//         </span>
-//     </h4>
-
-//     <div class="ui list">
-//         {% for tdi in wdi['tabs'] %}
-
-//             <div class="ui checkbox item">
-//                 <input type="checkbox" name="cb_tab_url" value="{{ tdi['url'] }}">
-//                 <label>
-//                     <a href="{{ tdi['url'] }}" style="font-size: 15px;" target="_blank" rel="noopener noreferrer">
-//                         {{ tdi['title'] }}
-//                     </a>
-//                 </label>
-//             </div>
-
-//         {% endfor %}
-//     </div>
-
-// </div>
-// <br/>
-
-// {% endfor %}
 
     </script>
 
