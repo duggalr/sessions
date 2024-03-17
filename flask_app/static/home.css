@@ -1,3 +1,14 @@
+body{
+    margin: 0;
+    padding: 0;
+    /* background-image: url('circle_two.svg'); */
+    background-image: url('wave_three.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* background-size: 100% 100%; */
+}
+
+
 .window-text-menu .item{
     font-size: 15px;
 }
