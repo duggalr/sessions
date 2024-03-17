@@ -7,8 +7,6 @@ import flask
 from flask import request, render_template, g, session, redirect, url_for
 from functools import wraps
 
-import utils
-
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -174,7 +172,6 @@ def create_session():
 @app.route('/update_session', methods=['POST'])
 def update_session():
 
-    # # TODO: pass session id
     session_id = request.json['session_id']
     session_name = request.json['session_name']
     new_tab_data = request.json['new_tab_data']
@@ -225,7 +222,6 @@ def delete_session():
     g.db.commit()
 
     return {'success': True}
-
 
 
 
