@@ -278,7 +278,7 @@
         <div class="header">Update Session</div>
         <div class="content">
         
-            <form class="ui form" >
+            <form class="ui form" id="update_modal_form">
 
                 <div class="field" style="width: 40%;">
                     <label>Session Name</label>
@@ -327,7 +327,7 @@
 
         </div>
         <div class="actions">
-            <div id="create_session_form_button" class="ui black approve button">Submit</div>
+            <div id="update_session_form_button" class="ui black approve button">Submit</div>
             <div class="ui cancel button">Cancel</div>
         </div>
     </div>
@@ -355,6 +355,7 @@
             let window_tabs = wdict['tabs'];
             for (y=0; y<=window_tabs.length-1; y++){
                 let w_tb_dict = window_tabs[y];
+                // console.log('w-tb-dict:', w_tb_dict)
                 let tb_url = w_tb_dict[3];
                 let tb_title = w_tb_dict[2];
                 let tb_favicon_url = w_tb_dict[4];
@@ -366,16 +367,17 @@
         let user_session_dict = {};
         for (i=0; i<=final_sessions_list.length-1; i++){
             let sdict = final_sessions_list[i];
-            console.log('session-sdict', sdict['session'])
+            // console.log('session-sdict', sdict['session'])
             let session_obj_id = sdict['session_object_id'];
             let session_tabs = sdict['tabs'];
             // let session_urls = [];
             let session_info_list = [];
             for (y=0; y<=session_tabs.length-1; y++){
                 let s_tb_list = session_tabs[y];
-                console.log(s_tb_list)
+                // console.log('s_tb_list', s_tb_list)
                 session_info_list.push({
-                    'sesssion_name': sdict['session'],
+                    'session_name': sdict['session'][1],
+                    'tab_id': s_tb_list[0],
                     'name': s_tb_list[1],
                     'url': s_tb_list[2],
                     'favicon_url': s_tb_list[3]
@@ -625,6 +627,7 @@
 
         });
 
+
         $('#create_session_form_button').click(function(){
 
             let requested_tabs = $('input[type="checkbox"][name="cb_tab_url"]:checked');
@@ -669,41 +672,193 @@
                 // $('#update_session_modal')
                 // $('#update_form_session_name').val(session_name);
                 
-                session_url_list
-                primary_window_form_div
+                // session_url_list
+                // primary_window_form_div
+
+                let existing_window_div = document.getElementsByClassName('primary_update_window_form_div');
+                console.log('primary-update-window:', existing_window_div)
+                if (existing_window_div.length == 1){
+                    existing_window_div[0].remove();
+                };
+
+                let initial_session_dict = session_tab_list[0];
+                let session_name = initial_session_dict['session_name'];
+                console.log('initial_session_dict', initial_session_dict);
+
+                // $('#update_form_session_name').val(session_name);
+                document.getElementById("update_form_session_name").value = session_name;
+                
+                let update_form_elem = document.getElementById('update_modal_form');
+                let parent_div = document.createElement('div');
+                parent_div.className = 'primary_update_window_form_div';
+
+                // let header_elem = document.createElement('h4');
+                // header_elem.innerText = session_name;
+
+                // let span_elem = document.createElement('span');
+                // let select_all_div = document.createElement('div');
+                // select_all_div.className = 'ui slider checkbox';
+                // let cb_input = document.createElement('input');
+                // cb_input.setAttribute("type", "checkbox");
+                // cb_input.className = 'window_toggle';
+                // let cb_label = document.createElement('label');
+                // cb_label.innerText = 'Select All';
+
+                // select_all_div.appendChild(cb_input);
+                // select_all_div.appendChild(cb_label);
+                // span_elem.appendChild(select_all_div);
+                // header_elem.appendChild(span_elem);
+
+                // parent_div.appendChild(header_elem);
+
+                let list_div = document.createElement('div');
+                list_div.className = 'ui list';
+
                 for (i=0; i<=session_tab_list.length-1; i++){
 
-                    // let cr_url = session_url_list[i];
                     let session_dict = session_tab_list[i];
-                    let session_name = session_dict['session_name'];
+                    let tab_id = session_dict['tab_id'];
                     let tab_url_name = session_dict['name'];
                     let tab_url = session_dict['url'];
                     let tab_favicon_url = session_dict['favicon_url'];
+                    
+                    let cb_item_div = document.createElement('div');
+                    cb_item_div.className = 'ui checkbox item';
+                    let cb_input_url = document.createElement('input');
+                    cb_input_url.setAttribute("type", "checkbox");
+                    cb_input_url.name = 'existing_update_cb_tab';
+                    // cb_input_url.value = tab_url;
+                    cb_input_url.value = tab_id;
+                    cb_input_url.checked = true;
+                    
+                    let label_url_element = document.createElement('label');
+                    let href_url_element = document.createElement('a');
+                    href_url_element.href = tab_url;
+                    href_url_element.innerText = tab_url_name;
+                    href_url_element.setAttribute('target', '_blank');
+                    href_url_element.setAttribute('rel', 'noopener noreferrer');
 
-                    // TODO: create and go from there
-                    let parent_div = document.createElement('div');
-                    parent_div.className = 'primary_window_form_div';
+                    label_url_element.appendChild(href_url_element);
+                    cb_item_div.appendChild(cb_input_url);
+                    cb_item_div.appendChild(label_url_element);
 
-                    let header_elem = document.createElement('h4');
-                    // header_elem.innerText = 
-                    header_elem.innerText = session_name;
+                    list_div.appendChild(cb_item_div);
 
-                    let span_elem = document.createElement('span');
-                    let select_all_div = document.createElement('div');
-                    select_all_div.className = 'ui slider checkbox';
-                    let cb_input = document.createElement('input');
-                    cb_input.setAttribute("type", "checkbox");
-                    cb_input.className = 'window_toggle';
-                    let cb_label = document.createElement('label');
-                    cb_label.innerText = 'Select All';
+                };
+
+                // parent_div.appendChild(header_elem);
+                parent_div.appendChild(list_div);
+
+                let other_header_elem = document.createElement('h4');
+                other_header_elem.className = 'ui header';
+                other_header_elem.innerText = 'Current Tabs';
+                
+                let other_list_elem = document.createElement('div');
+                other_list_elem.className = 'ui list';
+
+                for (tmp_url in tab_dict){
+
+                    let tb_url_dict = tab_dict[tmp_url];
+                    // 'url': tb_url, 'title': tb_title, 'favicon_url': tb_favicon_url}
+                    // tb_url_dict
+
+                    let cb_item_div = document.createElement('div');
+                    cb_item_div.className = 'ui checkbox item';
+                    let cb_input_url = document.createElement('input');
+                    cb_input_url.setAttribute("type", "checkbox");
+                    cb_input_url.name = 'new_update_cb_tab';
+                    cb_input_url.value = tmp_url;
+                    cb_input_url.checked = false;
+
+                    let label_url_element = document.createElement('label');
+                    let href_url_element = document.createElement('a');
+                    href_url_element.href = tmp_url;
+                    href_url_element.innerText = tb_url_dict['title'];
+                    href_url_element.setAttribute('target', '_blank');
+                    href_url_element.setAttribute('rel', 'noopener noreferrer');
+                    
+                    // other_list_elem.appendChild(cb_item_div);
+
+                    label_url_element.appendChild(href_url_element);
+                    cb_item_div.appendChild(cb_input_url);
+                    cb_item_div.appendChild(label_url_element);
+
+                    other_list_elem.appendChild(cb_item_div);
 
                 }
 
-                // TODO: update the code for open-sessions as above session_tab_url_list logic changed
+                var hidden_input = document.createElement("input");
+                hidden_input.setAttribute("type", "hidden");
+                hidden_input.name = 'hidden_update_session_id_value';
+                hidden_input.id = 'hidden_input_session_id_val';
+                hidden_input.value = session_id;
+
+                parent_div.appendChild(other_header_elem);
+                parent_div.appendChild(other_list_elem);
+                
+                parent_div.appendChild(hidden_input);
+
+                update_form_elem.appendChild(parent_div);
+
+                // TODO: 
+                    // add crud for all
+                    // update the code for open-sessions as above session_tab_url_list logic changed
+
+                $('.update_session_modal').modal('show');
 
             }
 
-        }
+        };
+
+
+        $('#update_session_form_button').click(function(){
+
+            let session_name = $('#update_form_session_name').val();
+
+            let existing_requested_tabs = $('#update_modal_form input[type="checkbox"][name="existing_update_cb_tab"]:checked');
+            let new_requested_tabs = $('#update_modal_form input[type="checkbox"][name="new_update_cb_tab"]:checked');
+
+            console.log('existing:', existing_requested_tabs);
+            // console.log('new:', new_requested_tabs)
+            
+            let existing_request_tab_data = [];
+            for (i = 0; i <= existing_requested_tabs.length-1; i++){
+                // requested_tab_data.push(requested_tabs[i].value)
+                let existing_tb_value = existing_requested_tabs[i].value;
+                existing_request_tab_data.push(existing_tb_value);
+            };
+
+            let new_request_tab_data = [];
+            for (i = 0; i <= new_requested_tabs.length-1; i++){
+                // requested_tab_data.push(requested_tabs[i].value)
+
+                let new_tb_value = new_requested_tabs[i].value;
+                let tmp_tb_dict = tab_dict[new_tb_value];
+                new_request_tab_data.push(tmp_tb_dict);
+            };
+
+            console.log('tb-data:', existing_request_tab_data, new_request_tab_data)
+
+            let current_session_id = $('#hidden_input_session_id_val').val();
+            console.log('current-session-id:', current_session_id);
+
+            $.ajax({
+                type : 'POST',
+                url : "{{ url_for('update_session') }}",
+                contentType: 'application/json;charset=UTF-8',
+                data : JSON.stringify({
+                    'session_id': current_session_id,
+                    'session_name': session_name,
+                    'new_tab_data': new_request_tab_data,
+                    'existing_tab_data': existing_request_tab_data
+                }),
+                success: function(res){
+                    // TODO: redirect to saved sessions page
+                }
+            });
+
+        })
+        
 
 
 //         {% for wdi in value['final_window_tab_list'] %}
@@ -740,7 +895,6 @@
 // <br/>
 
 // {% endfor %}
-
 
     </script>
 

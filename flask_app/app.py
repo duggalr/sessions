@@ -245,6 +245,47 @@ def create_session():
     return {'success': True}
 
 
+@app.route('/update_session', methods=['POST'])
+def update_session():
+    print('post-data:', request.json)
+
+    # # TODO: pass session id
+    session_id = request.json['session_id']
+    session_name = request.json['session_name']
+    new_tab_data = request.json['new_tab_data']
+    existing_tab_data = request.json['existing_tab_data']
+    existing_tab_data = [int(val) for val in existing_tab_data]
+    
+    cur = g.db.cursor(cursor_factory = psycopg2.extras.DictCursor)
+
+    sql = 'update saved_session set session_name = %s where id = %s'
+    cur.execute(sql, (session_name, session_id,))
+    g.db.commit()
+
+    sql = 'select * from saved_session_url where session_object_id = %s'
+    cur.execute(sql, (session_id,))
+    session_tab_urls = cur.fetchall()
+
+    existing_session_tab_id_list = [d['id'] for d in session_tab_urls]
+    print('exisiting-tab-id-list:', existing_session_tab_id_list)
+    print('new-tab-id-list:', existing_tab_data)
+    for tid in existing_session_tab_id_list:
+        if tid not in existing_tab_data:
+            sql = 'delete from saved_session_url where id = %s'
+            cur.execute(sql, (tid,))
+            g.db.commit()
+    
+    for tb_dict in new_tab_data:
+        tb_url = tb_dict['url']
+        tb_title = tb_dict['title']
+        tb_favicon_url = tb_dict['favicon_url']
+
+        sql = 'insert into saved_session_url(title, url, favicon_url, session_object_id) values (%s, %s, %s, %s)'
+        cur.execute(sql, (tb_title, tb_url, tb_favicon_url, session_id,))
+        g.db.commit()
+    
+    return {'success': True}
+
 
 @app.route('/delete_session', methods=['POST'])
 def delete_session():
